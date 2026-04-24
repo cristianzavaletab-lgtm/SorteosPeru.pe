@@ -21,7 +21,7 @@ router.get('/dashboard', protect, async (req, res) => {
   }
 });
 
-router.get('/login', (req, res) => res.render('login'));
-router.get('/register', (req, res) => res.render('register'));
+router.get('/login', (req, res) => res.render('login', { error: req.query.error }));
+router.get('/register', (req, res) => res.render('register', { error: req.query.error }));
 
 module.exports = router;

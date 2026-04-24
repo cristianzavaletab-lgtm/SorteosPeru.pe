@@ -16,19 +16,19 @@
             <% if (raffle.image) { %>
               <img src="<%= raffle.image %>" style="height: 180px; object-fit: cover;" class="card-img-top">
             <% } else { %>
-              <div class="d-flex align-items-center justify-content-center" style="height: 180px; background: linear-gradient(135deg, #7e22ce, #db2777);">
+              <div class="d-flex align-items-center justify-content-center" style="height: 180px; background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));">
                 <i class="bi bi-gift text-white" style="font-size: 4rem;"></i>
               </div>
             <% } %>
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <h5 class="card-title fw-bold mb-0"><%= raffle.title %></h5>
-                <span class="badge bg-primary rounded-pill px-3 py-2">S/<%= raffle.ticketPrice.toFixed(2) %></span>
+                <span class="badge rounded-pill px-3 py-2" style="background-color: var(--accent-color);">S/<%= raffle.ticketPrice.toFixed(2) %></span>
               </div>
-              <p class="text-muted small mb-2">Premio: <strong class="text-success">S/<%= raffle.prizeValue.toFixed(2) %></strong></p>
+              <p class="text-muted small mb-2">Premio: <strong class="text-dark">S/<%= raffle.prizeValue.toFixed(2) %></strong></p>
               <% if (raffle.drawDate) { %>
                 <p class="small text-muted mb-3">
-                  <i class="bi bi-calendar-event text-primary"></i>
+                  <i class="bi bi-calendar-event" style="color: var(--accent-color);"></i>
                   <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long'}) %> -
                   <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %>
                 </p>

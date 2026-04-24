@@ -23,27 +23,36 @@
           </thead>
           <tbody>
             <% if (payments && payments.length > 0) { %>
-              <% payments.forEach(payment => { %>
+              <% for (const payment of payments) { %>
                 <tr>
                   <td class="px-4 py-3 align-middle"><%= payment.createdAt.toLocaleDateString() %></td>
                   <td class="py-3 align-middle">
-                    <div class="fw-bold"><%= payment.userId.name %></div>
-                    <div class="small text-muted"><%= payment.userId.phone %></div>
+                    <div class="fw-bold"><%= payment.userId ? payment.userId.name : 'N/A' %></div>
+                    <div class="small text-muted"><%= payment.userId ? payment.userId.phone : 'N/A' %></div>
                   </td>
-                  <td class="py-3 align-middle"><%= payment.raffleId.title %></td>
+                  <td class="py-3 align-middle"><%= payment.raffleId ? payment.raffleId.title : 'Sorteo Eliminado' %></td>
                   <td class="py-3 align-middle fw-bold text-success">
-                    S/<%= payment.amount.toFixed(2) %>
+                    S/<%= payment.amount ? payment.amount.toFixed(2) : '0.00' %>
                     <% if (payment.ticketQty > 1) { %>
                       <span class="badge bg-primary ms-1"><%= payment.ticketQty %> tickets</span>
                     <% } %>
                   </td>
                   <td class="py-3 align-middle">
-                    <span class="badge <%= payment.paymentMethod === 'yape' ? 'bg-purple' : 'bg-info' %>" style="<%= payment.paymentMethod === 'yape' ? 'background-color: #742284;' : '' %>">
-                      <%= payment.paymentMethod.toUpperCase() %>
+                    <% 
+                      const isYape = payment.paymentMethod === 'yape';
+                      const badgeClass = isYape ? 'bg-purple' : 'bg-info';
+                      const badgeStyle = isYape ? 'background-color: #742284;' : '';
+                    %>
+                    <span class="badge <%= badgeClass %>" style="<%= badgeStyle %>">
+                      <%= (payment.paymentMethod || 'N/A').toUpperCase() %>
                     </span>
                   </td>
                   <td class="py-3 align-middle">
-                    <a href="<%= payment.receiptImage %>" target="_blank" class="btn btn-sm btn-outline-primary">Ver Imagen</a>
+                    <% if (payment.receiptImage) { %>
+                      <a href="<%= payment.receiptImage %>" target="_blank" class="btn btn-sm btn-outline-primary">Ver Imagen</a>
+                    <% } else { %>
+                      <span class="text-muted small">Sin imagen</span>
+                    <% } %>
                   </td>
                   <td class="px-4 py-3 align-middle text-end">
                     <div class="d-flex justify-content-end gap-2">
@@ -56,7 +65,7 @@
                     </div>
                   </td>
                 </tr>
-              <% }) %>
+              <% } %>
             <% } else { %>
               <tr>
                 <td colspan="7" class="text-center py-5 text-muted">No hay pagos pendientes de aprobación.</td>

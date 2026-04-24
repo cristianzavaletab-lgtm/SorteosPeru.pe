@@ -11,12 +11,12 @@
         <% if (raffle.image) { %>
           <div class="position-relative" style="height: 250px; overflow: hidden;">
             <img src="<%= raffle.image %>" class="w-100 h-100" style="object-fit: cover;">
-            <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+            <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(transparent, rgba(15, 23, 42, 0.85));">
               <h1 class="text-white fw-bold mb-0">Premio: S/<%= raffle.prizeValue.toFixed(2) %></h1>
             </div>
           </div>
         <% } else { %>
-          <div class="text-white p-5 text-center" style="background: linear-gradient(135deg, #7e22ce, #db2777);">
+          <div class="text-white p-5 text-center" style="background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));">
             <h1 class="display-4 fw-bold mb-0">Premio: S/<%= raffle.prizeValue.toFixed(2) %></h1>
           </div>
         <% } %>
@@ -24,7 +24,7 @@
         <div class="card-body p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="fw-bold mb-0"><%= raffle.title %></h2>
-            <span class="badge bg-light text-primary fs-5 px-3 py-2 border border-primary"><i class="bi bi-tag-fill"></i> S/<%= raffle.ticketPrice.toFixed(2) %></span>
+            <span class="badge bg-white fs-5 px-3 py-2 border" style="color: var(--accent-color); border-color: var(--accent-color) !important;"><i class="bi bi-tag-fill"></i> S/<%= raffle.ticketPrice.toFixed(2) %></span>
           </div>
 
           <% if (raffle.description) { %>
@@ -35,7 +35,7 @@
           <% if (raffle.drawDate) { %>
             <div class="bg-light p-4 rounded-3 mb-4 text-center">
               <p class="text-muted small mb-1">El sorteo se realiza el</p>
-              <h4 class="fw-bold text-primary mb-2">
+              <h4 class="fw-bold mb-2" style="color: var(--accent-color);">
                 <i class="bi bi-calendar-event"></i>
                 <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %>
               </h4>
@@ -45,19 +45,19 @@
               </h5>
               <div id="countdown" class="d-flex justify-content-center gap-3">
                 <div class="text-center">
-                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="days">--</div>
+                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="days" style="background-color: var(--accent-color);">--</div>
                   <small class="text-muted">Días</small>
                 </div>
                 <div class="text-center">
-                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="hours">--</div>
+                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="hours" style="background-color: var(--accent-color);">--</div>
                   <small class="text-muted">Horas</small>
                 </div>
                 <div class="text-center">
-                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="minutes">--</div>
+                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="minutes" style="background-color: var(--accent-color);">--</div>
                   <small class="text-muted">Min</small>
                 </div>
                 <div class="text-center">
-                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="seconds">--</div>
+                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="seconds" style="background-color: var(--accent-color);">--</div>
                   <small class="text-muted">Seg</small>
                 </div>
               </div>
@@ -90,9 +90,9 @@
             <div class="bg-light rounded-3 p-4 mb-4" id="ticketSelector" data-price="<%= raffle.ticketPrice %>" data-raffle-id="<%= raffle._id %>">
               <h5 class="fw-bold mb-3 text-center">¿Cuántos tickets quieres?</h5>
               <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
-                <button type="button" class="btn btn-outline-primary btn-lg rounded-circle fw-bold" id="btnMinus" style="width: 50px; height: 50px;" onclick="changeQty(-1)">−</button>
-                <span class="display-4 fw-bold text-primary mx-3" id="qtyDisplay">1</span>
-                <button type="button" class="btn btn-outline-primary btn-lg rounded-circle fw-bold" id="btnPlus" style="width: 50px; height: 50px;" onclick="changeQty(1)">+</button>
+                <button type="button" class="btn btn-outline-secondary btn-lg rounded-circle fw-bold" id="btnMinus" style="width: 50px; height: 50px;" onclick="changeQty(-1)">−</button>
+                <span class="display-4 fw-bold mx-3" id="qtyDisplay" style="color: var(--accent-color);">1</span>
+                <button type="button" class="btn btn-outline-secondary btn-lg rounded-circle fw-bold" id="btnPlus" style="width: 50px; height: 50px;" onclick="changeQty(1)">+</button>
               </div>
               <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
                 <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(1)">1</button>
@@ -143,7 +143,7 @@
 
           <!-- Solo mostrar CANTIDAD de participantes, NO nombres ni tickets -->
           <div class="bg-light rounded-3 p-4 text-center">
-            <i class="bi bi-people-fill text-primary fs-1 mb-2"></i>
+            <i class="bi bi-people-fill fs-1 mb-2" style="color: var(--accent-color);"></i>
             <h4 class="fw-bold mb-1"><%= ticketCount %> participantes</h4>
             <p class="text-muted small mb-0">Ya están inscritos en este sorteo. ¡No te quedes fuera!</p>
           </div>

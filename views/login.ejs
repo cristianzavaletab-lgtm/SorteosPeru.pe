@@ -3,11 +3,17 @@
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm p-4">
+      <div class="card shadow p-4 p-md-5 border-0">
         <div class="text-center mb-4">
-          <h2 class="fw-bold text-primary">Bienvenido de vuelta</h2>
-          <p class="text-muted">Ingresa tus datos para continuar</p>
+          <h2 class="fw-bold" style="color: var(--secondary-color);">Bienvenido de vuelta</h2>
+          <p class="text-muted text-center">Ingresa tus datos para participar</p>
         </div>
+
+        <% if (locals.error) { %>
+          <div class="alert alert-danger border-0 small py-2 text-center mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
+          </div>
+        <% } %>
         
         <form action="/auth/login" method="POST">
           <div class="mb-3">
@@ -16,17 +22,36 @@
           </div>
           <div class="mb-4">
             <label class="form-label text-muted small fw-bold">Contraseña</label>
-            <input type="password" class="form-control form-control-lg bg-light border-0" name="password" required placeholder="••••••••">
+            <div class="input-group">
+              <input type="password" class="form-control form-control-lg bg-light border-0" name="password" id="passwordInput" required placeholder="••••••••">
+              <button class="btn btn-light border-0" type="button" id="togglePassword">
+                <i class="bi bi-eye-fill text-muted"></i>
+              </button>
+            </div>
           </div>
           <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Ingresar</button>
         </form>
         
         <div class="text-center mt-3">
-          <p class="text-muted small">¿No tienes cuenta? <a href="/register" class="fw-bold text-primary text-decoration-none">Regístrate aquí</a></p>
+          <p class="text-muted small">¿No tienes cuenta? <a href="/register" class="fw-bold text-accent text-decoration-none" style="color: var(--accent-color)">Regístrate aquí</a></p>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  // Toggle Password Visibility
+  const togglePassword = document.querySelector('#togglePassword');
+  const passwordInput = document.querySelector('#passwordInput');
+  const toggleIcon = togglePassword.querySelector('i');
+
+  togglePassword.addEventListener('click', function (e) {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    toggleIcon.classList.toggle('bi-eye-fill');
+    toggleIcon.classList.toggle('bi-eye-slash-fill');
+  });
+</script>
 
 <%- include('partials/footer') %>
