@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<div class="hero-section text-center px-3">
+  <div class="container">
+    <h1 class="hero-title mb-3">¡Gana premios reales!</h1>
+    <p class="hero-subtitle mb-4">Participa en sorteos transparentes y en vivo.</p>
+    <a href="/sorteos" class="btn btn-light btn-lg text-primary fw-bold px-5 rounded-pill shadow-sm">Jugar Ahora</a>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row mb-5">
+    <div class="col-12 text-center">
+      <h2 class="fw-bold mb-4">Cómo Funciona</h2>
+    </div>
+    <div class="col-md-4 text-center mb-4 mb-md-0">
+      <div class="bg-white p-4 rounded-circle shadow-sm d-inline-flex mb-3 align-items-center justify-content-center" style="width: 80px; height: 80px;">
+        <i class="bi bi-ticket-perforated fs-2 text-primary"></i>
+      </div>
+      <h5 class="fw-bold">1. Elige tu Sorteo</h5>
+      <p class="text-muted small">Selecciona el sorteo en el que deseas participar y compra tu entrada.</p>
+    </div>
+    <div class="col-md-4 text-center mb-4 mb-md-0">
+      <div class="bg-white p-4 rounded-circle shadow-sm d-inline-flex mb-3 align-items-center justify-content-center" style="width: 80px; height: 80px;">
+        <i class="bi bi-phone-vibrate fs-2 text-primary"></i>
+      </div>
+      <h5 class="fw-bold">2. Paga con Yape/Plin</h5>
+      <p class="text-muted small">Sube tu comprobante de pago seguro y recibe tu ticket automático.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <div class="bg-white p-4 rounded-circle shadow-sm d-inline-flex mb-3 align-items-center justify-content-center" style="width: 80px; height: 80px;">
+        <i class="bi bi-gift fs-2 text-primary"></i>
+      </div>
+      <h5 class="fw-bold">3. Gana en Vivo</h5>
+      <p class="text-muted small">Mira el sorteo en vivo y descubre si eres el afortunado ganador.</p>
+    </div>
+  </div>
+
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="fw-bold mb-0">Sorteos Activos</h2>
+    </div>
+    <div class="col-auto">
+      <a href="/sorteos" class="text-decoration-none fw-bold">Ver todos <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <% if (activeRaffles && activeRaffles.length > 0) { %>
+      <% activeRaffles.slice(0,3).forEach(raffle => { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 overflow-hidden">
+            <% if (raffle.image) { %>
+              <img src="<%= raffle.image %>" style="height: 160px; object-fit: cover;" class="card-img-top">
+            <% } else { %>
+              <div class="d-flex align-items-center justify-content-center" style="height: 160px; background: linear-gradient(135deg, #7e22ce, #db2777);">
+                <i class="bi bi-gift text-white" style="font-size: 3rem;"></i>
+              </div>
+            <% } %>
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title fw-bold mb-0"><%= raffle.title %></h5>
+                <span class="badge bg-primary rounded-pill px-3 py-2">S/<%= raffle.ticketPrice.toFixed(2) %></span>
+              </div>
+              <p class="text-muted small mb-2">Premio: <strong class="text-dark">S/<%= raffle.prizeValue.toFixed(2) %></strong></p>
+              <% if (raffle.drawDate) { %>
+                <p class="small mb-3">
+                  <i class="bi bi-calendar-event text-primary"></i>
+                  <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'short', day:'2-digit', month:'short'}) %> -
+                  <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %>
+                </p>
+              <% } %>
+              <a href="/sorteos/<%= raffle._id %>" class="btn btn-outline-primary w-100">Participar Ahora</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-12 text-center text-muted">
+        <p>No hay sorteos activos en este momento.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

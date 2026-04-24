@@ -1,0 +1,156 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <a href="/sorteos" class="text-decoration-none text-muted mb-3 d-inline-block">
+        <i class="bi bi-arrow-left"></i> Volver a sorteos
+      </a>
+      
+      <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+        <% if (raffle.image) { %>
+          <div class="position-relative" style="height: 250px; overflow: hidden;">
+            <img src="<%= raffle.image %>" class="w-100 h-100" style="object-fit: cover;">
+            <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+              <h1 class="text-white fw-bold mb-0">Premio: S/<%= raffle.prizeValue.toFixed(2) %></h1>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="text-white p-5 text-center" style="background: linear-gradient(135deg, #7e22ce, #db2777);">
+            <h1 class="display-4 fw-bold mb-0">Premio: S/<%= raffle.prizeValue.toFixed(2) %></h1>
+          </div>
+        <% } %>
+
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold mb-0"><%= raffle.title %></h2>
+            <span class="badge bg-light text-primary fs-5 px-3 py-2 border border-primary"><i class="bi bi-tag-fill"></i> S/<%= raffle.ticketPrice.toFixed(2) %></span>
+          </div>
+
+          <% if (raffle.description) { %>
+            <p class="text-muted mb-3"><%= raffle.description %></p>
+          <% } %>
+
+          <!-- Fecha y hora del sorteo con cuenta regresiva -->
+          <% if (raffle.drawDate) { %>
+            <div class="bg-light p-4 rounded-3 mb-4 text-center">
+              <p class="text-muted small mb-1">El sorteo se realiza el</p>
+              <h4 class="fw-bold text-primary mb-2">
+                <i class="bi bi-calendar-event"></i>
+                <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %>
+              </h4>
+              <h5 class="fw-bold mb-3">
+                <i class="bi bi-clock"></i>
+                <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12: true}) %>
+              </h5>
+              <div id="countdown" class="d-flex justify-content-center gap-3">
+                <div class="text-center">
+                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="days">--</div>
+                  <small class="text-muted">Días</small>
+                </div>
+                <div class="text-center">
+                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="hours">--</div>
+                  <small class="text-muted">Horas</small>
+                </div>
+                <div class="text-center">
+                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="minutes">--</div>
+                  <small class="text-muted">Min</small>
+                </div>
+                <div class="text-center">
+                  <div class="bg-primary text-white rounded-3 px-3 py-2 fw-bold fs-4" id="seconds">--</div>
+                  <small class="text-muted">Seg</small>
+                </div>
+              </div>
+            </div>
+            <script>
+              const drawDate = new Date("<%= raffle.drawDate.toISOString() %>");
+              function updateCountdown() {
+                const now = new Date();
+                const diff = drawDate - now;
+                if (diff <= 0) {
+                  document.getElementById('countdown').innerHTML = '<p class="text-danger fw-bold fs-5 mb-0">¡Sorteo en curso!</p>';
+                  return;
+                }
+                const d = Math.floor(diff / (1000*60*60*24));
+                const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+                const m = Math.floor((diff%(1000*60*60))/(1000*60));
+                const s = Math.floor((diff%(1000*60))/1000);
+                document.getElementById('days').textContent = String(d).padStart(2,'0');
+                document.getElementById('hours').textContent = String(h).padStart(2,'0');
+                document.getElementById('minutes').textContent = String(m).padStart(2,'0');
+                document.getElementById('seconds').textContent = String(s).padStart(2,'0');
+              }
+              updateCountdown();
+              setInterval(updateCountdown, 1000);
+            </script>
+          <% } %>
+
+          <% if (raffle.status === 'active') { %>
+            <!-- SELECTOR DE CANTIDAD -->
+            <div class="bg-light rounded-3 p-4 mb-4" id="ticketSelector" data-price="<%= raffle.ticketPrice %>" data-raffle-id="<%= raffle._id %>">
+              <h5 class="fw-bold mb-3 text-center">¿Cuántos tickets quieres?</h5>
+              <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                <button type="button" class="btn btn-outline-primary btn-lg rounded-circle fw-bold" id="btnMinus" style="width: 50px; height: 50px;" onclick="changeQty(-1)">−</button>
+                <span class="display-4 fw-bold text-primary mx-3" id="qtyDisplay">1</span>
+                <button type="button" class="btn btn-outline-primary btn-lg rounded-circle fw-bold" id="btnPlus" style="width: 50px; height: 50px;" onclick="changeQty(1)">+</button>
+              </div>
+              <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(1)">1</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(2)">2</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(3)">3</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(5)">5</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="setQty(10)">10</button>
+              </div>
+              <div class="text-center mb-3">
+                <p class="text-muted small mb-1"><span id="qtyText">1</span> ticket × S/<%= raffle.ticketPrice.toFixed(2) %></p>
+                <h3 class="fw-bold mb-0">Total: <span class="text-success" id="totalAmount">S/<%= raffle.ticketPrice.toFixed(2) %></span></h3>
+              </div>
+              <a href="#" id="buyBtn" class="btn btn-primary btn-lg w-100 py-3 fs-5">
+                <i class="bi bi-cart-check-fill me-2"></i> Comprar <span id="buyQtyText">1 ticket</span>
+              </a>
+            </div>
+
+            <script>
+              var selectorEl = document.getElementById('ticketSelector');
+              var qty = 1;
+              var price = parseFloat(selectorEl.dataset.price);
+              var raffleId = selectorEl.dataset.raffleId;
+
+              function updateUI() {
+                document.getElementById('qtyDisplay').textContent = qty;
+                document.getElementById('qtyText').textContent = qty;
+                document.getElementById('totalAmount').textContent = 'S/' + (qty * price).toFixed(2);
+                document.getElementById('buyQtyText').textContent = qty === 1 ? '1 ticket' : qty + ' tickets';
+                document.getElementById('buyBtn').href = '/pagos/' + raffleId + '?qty=' + qty;
+                document.getElementById('btnMinus').disabled = qty <= 1;
+              }
+
+              function changeQty(delta) {
+                qty = Math.max(1, qty + delta);
+                updateUI();
+              }
+
+              function setQty(n) {
+                qty = n;
+                updateUI();
+              }
+
+              updateUI();
+            </script>
+          <% } else if (raffle.status === 'completed') { %>
+            <button class="btn btn-secondary btn-lg w-100 mb-4 py-3 fs-5" disabled>Sorteo Finalizado</button>
+          <% } %>
+
+          <!-- Solo mostrar CANTIDAD de participantes, NO nombres ni tickets -->
+          <div class="bg-light rounded-3 p-4 text-center">
+            <i class="bi bi-people-fill text-primary fs-1 mb-2"></i>
+            <h4 class="fw-bold mb-1"><%= ticketCount %> participantes</h4>
+            <p class="text-muted small mb-0">Ya están inscritos en este sorteo. ¡No te quedes fuera!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

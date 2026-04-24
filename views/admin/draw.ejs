@@ -1,0 +1,363 @@
+<%- include('../partials/header') %>
+
+<style>
+  .slot-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 4px solid #9333ea;
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.3);
+    background: white;
+  }
+  .slot-container::before,
+  .slot-container::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 100px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .slot-container::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0));
+  }
+  .slot-container::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+  }
+  .slot-pointer {
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 60px; margin-top: -30px;
+    border-top: 3px solid #f59e0b;
+    border-bottom: 3px solid #f59e0b;
+    background: rgba(245,158,11,0.08);
+    z-index: 6; pointer-events: none;
+  }
+  .slot-pointer::before {
+    content: '▶'; position: absolute; left: -20px; top: 50%;
+    transform: translateY(-50%); color: #f59e0b; font-size: 1.2rem;
+  }
+  .slot-pointer::after {
+    content: '◀'; position: absolute; right: -20px; top: 50%;
+    transform: translateY(-50%); color: #f59e0b; font-size: 1.2rem;
+  }
+  .slot-strip {
+    position: absolute; top: 0; left: 0; width: 100%;
+  }
+  .slot-item {
+    height: 60px; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 1.1rem; color: #1e1b4b;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .slot-item:nth-child(odd) { background: #faf5ff; }
+  .slot-item:nth-child(even) { background: #fff; }
+
+  .spin-counter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 50px; height: 50px; border-radius: 50%;
+    font-size: 1.5rem; font-weight: 800;
+  }
+  .spin-dot { 
+    width: 16px; height: 16px; border-radius: 50%; 
+    display: inline-block; margin: 0 3px;
+    transition: all 0.3s ease;
+  }
+  .spin-dot.done { background: #22c55e; transform: scale(1.2); }
+  .spin-dot.active { background: #f59e0b; animation: pulse-dot 0.5s infinite alternate; }
+  .spin-dot.pending { background: #e5e7eb; }
+  @keyframes pulse-dot { from { transform: scale(1); } to { transform: scale(1.3); } }
+
+  .winner-card { display: none; animation: fadeUp 0.8s ease; }
+  .winner-card.show { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .confetti-piece {
+    position: fixed; top: -10px; z-index: 9999; pointer-events: none;
+    animation: confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-7 text-center">
+      <a href="/admin/sorteos" class="text-decoration-none text-muted d-block mb-3">
+        <i class="bi bi-arrow-left"></i> Volver a sorteos
+      </a>
+      
+      <h2 class="fw-bold mb-2"><%= raffle.title %></h2>
+      <p class="text-muted fs-5 mb-1">Premio: <strong class="text-success">S/<%= raffle.prizeValue %></strong></p>
+      <p class="text-muted mb-4"><strong><%= tickets.length %></strong> tickets participando</p>
+
+      <!-- LISTA DE PARTICIPANTES -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#participantsList" style="cursor: pointer;">
+          <span><i class="bi bi-people-fill me-2"></i> Ver Participantes (<%= tickets.length %>)</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="collapse" id="participantsList">
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th class="px-3 py-2">#</th>
+                    <th class="py-2">Ticket</th>
+                    <th class="py-2">Nombre</th>
+                    <th class="py-2">WhatsApp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% tickets.forEach((ticket, idx) => { %>
+                    <tr>
+                      <td class="px-3 py-2 text-muted"><%= idx + 1 %></td>
+                      <td class="py-2"><span class="badge bg-light text-dark"><%= ticket.ticketNumber %></span></td>
+                      <td class="py-2"><%= ticket.userId.name %></td>
+                      <td class="py-2"><%= ticket.userId.phone %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN DE GIROS -->
+      <div class="card border-0 shadow-sm mb-4" id="configCard">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill text-primary me-2"></i>Configurar Sorteo</h5>
+          <label class="form-label text-muted small fw-bold">¿En qué giro se revela el ganador?</label>
+          <div class="d-flex align-items-center gap-3 justify-content-center">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="setTotalSpins(3)">3</button>
+              <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="setTotalSpins(5)">5</button>
+              <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="setTotalSpins(7)">7</button>
+              <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="setTotalSpins(10)">10</button>
+            </div>
+            <span class="text-muted">o</span>
+            <input type="number" class="form-control" id="customSpins" style="width: 80px;" min="1" max="20" value="5" onchange="setTotalSpins(parseInt(this.value))">
+          </div>
+          <p class="text-muted small mt-2 mb-0">El ganador se revelará en el giro #<strong id="totalSpinsText">5</strong>. Los giros anteriores solo generan suspenso.</p>
+        </div>
+      </div>
+
+      <!-- SLOT MACHINE -->
+      <div class="card border-0 shadow-lg p-4 p-md-5" id="rouletteCard">
+        <!-- Indicador de giros -->
+        <div class="mb-4" id="spinTracker">
+          <h5 class="fw-bold mb-2">Giro <span id="currentSpinNum">0</span> de <span id="totalSpinNum">5</span></h5>
+          <div id="spinDots" class="d-flex justify-content-center flex-wrap gap-1 mb-2"></div>
+        </div>
+
+        <div class="slot-container mb-4" id="slotContainer" 
+             data-tickets='<%- JSON.stringify(tickets.map(t => ({ number: t.ticketNumber, name: t.userId.name }))) %>'
+             data-raffle-id="<%= raffle._id %>">
+          <div class="slot-pointer"></div>
+          <div class="slot-strip" id="slotStrip"></div>
+        </div>
+
+        <div id="controls">
+          <button class="btn btn-danger btn-lg w-100 py-3 fs-5 fw-bold shadow-sm" id="spinBtn" <%= tickets.length === 0 ? 'disabled' : '' %>>
+            <i class="bi bi-play-circle-fill me-2"></i> <span id="spinBtnText">GIRAR (Giro 1)</span>
+          </button>
+          <% if (tickets.length === 0) { %>
+            <p class="text-danger small mt-2">No hay tickets válidos para sortear.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- RESULTADO GANADOR -->
+      <div class="card border-0 shadow-lg p-5 mt-4 winner-card" id="winnerCard">
+        <div style="font-size: 5rem;">🏆</div>
+        <h2 class="fw-bold mt-3 mb-2">¡Tenemos Ganador!</h2>
+        <div class="bg-light p-4 rounded-3 mb-3">
+          <h3 class="fw-bold text-primary mb-1" id="winnerName"></h3>
+          <div class="badge bg-success fs-5 p-2 mb-2" id="winnerTicket"></div>
+          <h4 class="fw-bold" id="winnerPrize"></h4>
+        </div>
+        <a href="/admin/ganadores" class="btn btn-primary w-100">Ver Ganadores</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var container = document.getElementById('slotContainer');
+  var ticketsData = JSON.parse(container.dataset.tickets);
+  var raffleId = container.dataset.raffleId;
+  var slotStrip = document.getElementById('slotStrip');
+  var spinBtn = document.getElementById('spinBtn');
+  var winnerCard = document.getElementById('winnerCard');
+  var rouletteCard = document.getElementById('rouletteCard');
+  var configCard = document.getElementById('configCard');
+
+  var totalSpins = 5;
+  var currentSpin = 0;
+  var isSpinning = false;
+  var currentPos = 0;
+  var speed = 0;
+  var animId = null;
+  var winnerData = null;
+
+  // Crear tira de nombres
+  var allItems = [];
+  for (var r = 0; r < 30; r++) {
+    for (var t = 0; t < ticketsData.length; t++) {
+      allItems.push(ticketsData[t]);
+    }
+  }
+  slotStrip.innerHTML = '';
+  for (var i = 0; i < allItems.length; i++) {
+    var div = document.createElement('div');
+    div.className = 'slot-item';
+    div.innerHTML = '<span style="color:#9333ea;margin-right:8px;">🎫</span> ' + allItems[i].name;
+    slotStrip.appendChild(div);
+  }
+
+  function setTotalSpins(n) {
+    totalSpins = Math.max(1, Math.min(20, n));
+    document.getElementById('customSpins').value = totalSpins;
+    document.getElementById('totalSpinsText').textContent = totalSpins;
+    updateSpinUI();
+  }
+
+  function updateSpinUI() {
+    document.getElementById('currentSpinNum').textContent = currentSpin;
+    document.getElementById('totalSpinNum').textContent = totalSpins;
+
+    var dotsHtml = '';
+    for (var d = 1; d <= totalSpins; d++) {
+      var cls = d <= currentSpin ? 'done' : (d === currentSpin + 1 ? 'active' : 'pending');
+      var label = d === totalSpins ? '🏆' : d;
+      dotsHtml += '<div class="spin-dot ' + cls + '" title="Giro ' + d + '">' + '</div>';
+    }
+    document.getElementById('spinDots').innerHTML = dotsHtml;
+
+    var nextSpin = currentSpin + 1;
+    if (nextSpin > totalSpins) {
+      spinBtn.classList.add('d-none');
+    } else if (nextSpin === totalSpins) {
+      document.getElementById('spinBtnText').innerHTML = '🏆 GIRO FINAL (' + nextSpin + '/' + totalSpins + ')';
+      spinBtn.className = 'btn btn-warning btn-lg w-100 py-3 fs-5 fw-bold shadow-sm';
+    } else {
+      document.getElementById('spinBtnText').textContent = 'GIRAR (Giro ' + nextSpin + ')';
+      spinBtn.className = 'btn btn-danger btn-lg w-100 py-3 fs-5 fw-bold shadow-sm';
+    }
+  }
+
+  function animate() {
+    currentPos += speed;
+    var maxScroll = allItems.length * 60;
+    if (currentPos > maxScroll / 2) currentPos = 0;
+    slotStrip.style.transform = 'translateY(-' + currentPos + 'px)';
+    animId = requestAnimationFrame(animate);
+  }
+
+  spinBtn.addEventListener('click', function() {
+    if (ticketsData.length === 0 || isSpinning) return;
+    isSpinning = true;
+    currentSpin++;
+    spinBtn.disabled = true;
+
+    // Ocultar config después del primer giro
+    if (currentSpin === 1) configCard.style.display = 'none';
+
+    var isFinalSpin = currentSpin >= totalSpins;
+
+    // Si es el giro final, pedir ganador al backend
+    if (isFinalSpin) {
+      fetch('/admin/sorteos/' + raffleId + '/ejecutar', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.success) {
+            alert(data.error || 'Error al ejecutar sorteo');
+            isSpinning = false;
+            spinBtn.disabled = false;
+            return;
+          }
+          winnerData = data.winner;
+          startSpin(true);
+        })
+        .catch(function() {
+          alert('Error de conexión');
+          isSpinning = false;
+          spinBtn.disabled = false;
+        });
+    } else {
+      startSpin(false);
+    }
+  });
+
+  function startSpin(isFinal) {
+    speed = 20 + Math.random() * 10;
+    currentPos = Math.random() * 500;
+    animate();
+
+    // Girar entre 2-4 segundos, luego frenar
+    var spinDuration = 2000 + Math.random() * 2000;
+    setTimeout(function() {
+      decelerate(isFinal);
+    }, spinDuration);
+  }
+
+  function decelerate(isFinal) {
+    speed *= 0.94;
+    if (speed < 0.5) {
+      cancelAnimationFrame(animId);
+      isSpinning = false;
+      updateSpinUI();
+
+      if (isFinal && winnerData) {
+        setTimeout(function() {
+          launchConfetti();
+          document.getElementById('winnerName').textContent = winnerData.name;
+          document.getElementById('winnerTicket').textContent = 'Ticket: ' + winnerData.ticketNumber;
+          document.getElementById('winnerPrize').textContent = 'Premio: S/' + winnerData.prize;
+          winnerCard.classList.add('show');
+          rouletteCard.style.display = 'none';
+        }, 800);
+      } else {
+        spinBtn.disabled = false;
+      }
+      return;
+    }
+    currentPos += speed;
+    var maxScroll = allItems.length * 60;
+    if (currentPos > maxScroll / 2) currentPos = 0;
+    slotStrip.style.transform = 'translateY(-' + currentPos + 'px)';
+    requestAnimationFrame(function() { decelerate(isFinal); });
+  }
+
+  function launchConfetti() {
+    var colors = ['#9333ea', '#ec4899', '#f59e0b', '#22c55e', '#3b82f6', '#ef4444'];
+    for (var c = 0; c < 100; c++) {
+      var p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.width = (Math.random() * 10 + 5) + 'px';
+      p.style.height = (Math.random() * 10 + 5) + 'px';
+      p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      p.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      p.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      p.style.animationDelay = Math.random() * 0.5 + 's';
+      document.body.appendChild(p);
+      (function(el) { setTimeout(function() { el.remove(); }, 6000); })(p);
+    }
+  }
+
+  // Inicializar UI
+  updateSpinUI();
+</script>
+
+<%- include('../partials/footer') %>

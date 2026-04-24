@@ -1,0 +1,51 @@
+<%- include('partials/header') %>
+
+<div class="hero-section text-center px-3" style="padding: 3rem 0; border-radius: 0;">
+  <div class="container">
+    <h1 class="hero-title mb-2">Sorteos Activos</h1>
+    <p class="hero-subtitle mb-0">Elige el sorteo que más te guste y participa hoy mismo.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <% if (raffles && raffles.length > 0) { %>
+      <% raffles.forEach(raffle => { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-0 shadow-sm overflow-hidden">
+            <% if (raffle.image) { %>
+              <img src="<%= raffle.image %>" style="height: 180px; object-fit: cover;" class="card-img-top">
+            <% } else { %>
+              <div class="d-flex align-items-center justify-content-center" style="height: 180px; background: linear-gradient(135deg, #7e22ce, #db2777);">
+                <i class="bi bi-gift text-white" style="font-size: 4rem;"></i>
+              </div>
+            <% } %>
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title fw-bold mb-0"><%= raffle.title %></h5>
+                <span class="badge bg-primary rounded-pill px-3 py-2">S/<%= raffle.ticketPrice.toFixed(2) %></span>
+              </div>
+              <p class="text-muted small mb-2">Premio: <strong class="text-success">S/<%= raffle.prizeValue.toFixed(2) %></strong></p>
+              <% if (raffle.drawDate) { %>
+                <p class="small text-muted mb-3">
+                  <i class="bi bi-calendar-event text-primary"></i>
+                  <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long'}) %> -
+                  <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %>
+                </p>
+              <% } %>
+              <a href="/sorteos/<%= raffle._id %>" class="btn btn-outline-primary w-100">Ver Detalles</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-emoji-frown fs-1 text-muted mb-3 d-block"></i>
+        <h4 class="text-muted">No hay sorteos activos en este momento.</h4>
+        <p class="text-muted">Vuelve pronto para más oportunidades de ganar.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

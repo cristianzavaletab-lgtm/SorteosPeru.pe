@@ -1,0 +1,104 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Historial de Ganadores</h2>
+    <a href="/admin" class="btn btn-outline-secondary">Volver al Panel</a>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted small mb-1">Total Ganadores</h5>
+        <h2 class="fw-bold text-primary mb-0"><%= winners.length %></h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted small mb-1">Premios Entregados</h5>
+        <h2 class="fw-bold text-success mb-0"><%= winners.filter(w => w.deliveryStatus === 'delivered').length %></h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted small mb-1">Total en Premios</h5>
+        <h2 class="fw-bold text-warning mb-0">S/<%= winners.reduce((sum, w) => sum + w.prizeValue, 0).toFixed(2) %></h2>
+      </div>
+    </div>
+  </div>
+
+  <% if (winners.length > 0) { %>
+    <% winners.forEach(winner => { %>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center">
+            <!-- Ícono -->
+            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 55px; height: 55px; background: linear-gradient(135deg, #f59e0b, #fbbf24); font-size: 1.5rem;">
+              🏆
+            </div>
+            
+            <!-- Info del ganador -->
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start flex-wrap">
+                <div>
+                  <h5 class="fw-bold mb-1"><%= winner.userId ? winner.userId.name : 'Usuario eliminado' %></h5>
+                  <p class="text-muted small mb-1">
+                    <i class="bi bi-telephone-fill text-primary me-1"></i> 
+                    <%= winner.userId ? winner.userId.phone : 'N/A' %>
+                    <span class="mx-2">|</span>
+                    <i class="bi bi-envelope-fill text-primary me-1"></i>
+                    <%= winner.userId ? winner.userId.email : 'N/A' %>
+                  </p>
+                  <p class="small mb-0">
+                    <span class="badge bg-light text-dark me-2"><i class="bi bi-gift me-1"></i> <%= winner.raffleId ? winner.raffleId.title : 'Sorteo eliminado' %></span>
+                    <span class="badge bg-light text-dark me-2"><i class="bi bi-ticket-perforated me-1"></i> <%= winner.ticketId ? winner.ticketId.ticketNumber : 'N/A' %></span>
+                    <span class="badge bg-success"><i class="bi bi-cash me-1"></i> S/<%= winner.prizeValue %></span>
+                  </p>
+                </div>
+                <div class="text-end mt-2 mt-md-0">
+                  <p class="small text-muted mb-2"><%= winner.createdAt.toLocaleDateString('es-PE', {day:'2-digit', month:'long', year:'numeric'}) %></p>
+                  
+                  <% if (winner.deliveryStatus === 'delivered') { %>
+                    <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Entregado</span>
+                  <% } else { %>
+                    <div class="d-flex gap-2 justify-content-end">
+                      <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-clock-fill me-1"></i> Pendiente</span>
+                      <form action="/admin/ganadores/<%= winner._id %>/entregar" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-success" title="Marcar como entregado">
+                          <i class="bi bi-check2-all"></i> Entregar
+                        </button>
+                      </form>
+                    </div>
+                  <% } %>
+
+                  <!-- Botón WhatsApp -->
+                  <% if (winner.userId && winner.userId.phone) { %>
+                    <% 
+                      const phone = winner.userId.phone.replace(/\s/g, '');
+                      const phoneF = phone.startsWith('51') ? phone : '51' + phone;
+                      const msg = winner.deliveryStatus === 'delivered' 
+                        ? `¡Hola ${winner.userId.name}! Tu premio de S/${winner.prizeValue} ya fue entregado. ¡Gracias por participar en SorteosPeru.pe! 🎉`
+                        : `¡Hola ${winner.userId.name}! 🏆 Ganaste S/${winner.prizeValue} en nuestro sorteo. Coordinaremos la entrega de tu premio. — SorteosPeru.pe`;
+                    %>
+                    <a href="https://wa.me/<%= phoneF %>?text=<%= encodeURIComponent(msg) %>" target="_blank" class="btn btn-sm btn-outline-success mt-2">
+                      <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-trophy fs-1 d-block mb-3"></i>
+      <h4>Aún no hay ganadores registrados.</h4>
+      <p>Los ganadores aparecerán aquí cuando ejecutes un sorteo.</p>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,135 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Gestionar Sorteos</h2>
+    <a href="/admin" class="btn btn-outline-secondary">Volver al Panel</a>
+  </div>
+
+  <div class="row">
+    <!-- Formulario Crear / Editar -->
+    <div class="col-md-5 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header fw-bold text-white" style="background: linear-gradient(135deg, #9333ea, #ec4899);">
+          <%= editRaffle ? '✏️ Editar Sorteo' : '➕ Crear Nuevo Sorteo' %>
+        </div>
+        <div class="card-body">
+          <form action="<%= editRaffle ? '/admin/sorteos/' + editRaffle._id + '/editar' : '/admin/sorteos' %>" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Título del Sorteo</label>
+              <input type="text" class="form-control" name="title" required value="<%= editRaffle ? editRaffle.title : '' %>" placeholder="Ej: Sorteo Semanal S/50">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Descripción (opcional)</label>
+              <textarea class="form-control" name="description" rows="2" placeholder="Descripción breve del sorteo"><%= editRaffle ? (editRaffle.description || '') : '' %></textarea>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label small fw-bold">Premio (S/)</label>
+                <input type="number" class="form-control" name="prizeValue" required value="<%= editRaffle ? editRaffle.prizeValue : '' %>" placeholder="50">
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label small fw-bold">Precio Ticket (S/)</label>
+                <input type="number" class="form-control" name="ticketPrice" required value="<%= editRaffle ? editRaffle.ticketPrice : '' %>" step="0.5" placeholder="2">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Máx. Participantes</label>
+              <input type="number" class="form-control" name="maxParticipants" required value="<%= editRaffle ? editRaffle.maxParticipants : '' %>" placeholder="50">
+            </div>
+            
+            <!-- FECHA Y HORA DEL SORTEO -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">📅 Fecha y Hora del Sorteo</label>
+              <input type="datetime-local" class="form-control" name="drawDate" value="<%= editRaffle && editRaffle.drawDate ? new Date(editRaffle.drawDate.getTime() - editRaffle.drawDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>">
+              <div class="form-text text-muted">El sorteo se cierra 1 minuto antes de esta hora. Ya no se podrán comprar tickets.</div>
+            </div>
+
+            <!-- IMAGEN PROMOCIONAL -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">🖼️ Imagen Promocional (opcional)</label>
+              <% if (editRaffle && editRaffle.image) { %>
+                <div class="mb-2">
+                  <img src="<%= editRaffle.image %>" class="img-fluid rounded" style="max-height: 120px;">
+                  <p class="small text-muted mt-1">Imagen actual. Sube otra para reemplazarla.</p>
+                </div>
+              <% } %>
+              <input type="file" class="form-control" name="image" accept="image/png, image/jpeg">
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold">Estado</label>
+              <select class="form-select" name="status">
+                <option value="draft" <%= editRaffle && editRaffle.status === 'draft' ? 'selected' : '' %>>Borrador</option>
+                <option value="active" <%= (!editRaffle || editRaffle.status === 'active') ? 'selected' : '' %>>Activo</option>
+                <option value="cancelled" <%= editRaffle && editRaffle.status === 'cancelled' ? 'selected' : '' %>>Cancelado</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100"><%= editRaffle ? 'Guardar Cambios' : 'Crear Sorteo' %></button>
+            <% if (editRaffle) { %>
+              <a href="/admin/sorteos" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+            <% } %>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Sorteos -->
+    <div class="col-md-7">
+      <% if (raffles && raffles.length > 0) { %>
+        <% raffles.forEach(raffle => { %>
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body p-3">
+              <div class="d-flex align-items-center">
+                <% if (raffle.image) { %>
+                  <img src="<%= raffle.image %>" class="rounded me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                <% } else { %>
+                  <div class="rounded me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; background: linear-gradient(135deg, #9333ea, #ec4899);">
+                    <i class="bi bi-gift text-white fs-3"></i>
+                  </div>
+                <% } %>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="fw-bold mb-1"><%= raffle.title %></h6>
+                    <span class="badge bg-<%= raffle.status === 'active' ? 'success' : (raffle.status === 'draft' ? 'secondary' : (raffle.status === 'completed' ? 'dark' : 'danger')) %> ms-2">
+                      <%= raffle.status === 'active' ? 'ACTIVO' : (raffle.status === 'draft' ? 'BORRADOR' : (raffle.status === 'completed' ? 'COMPLETADO' : 'CANCELADO')) %>
+                    </span>
+                  </div>
+                  <p class="small text-muted mb-1">
+                    Premio: <strong class="text-success">S/<%= raffle.prizeValue %></strong> | Ticket: S/<%= raffle.ticketPrice %>
+                  </p>
+                  <% if (raffle.drawDate) { %>
+                    <p class="small mb-0">
+                      <i class="bi bi-calendar-event text-primary"></i>
+                      <strong><%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %></strong>
+                      a las <strong><%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12: true}) %></strong>
+                    </p>
+                  <% } %>
+                </div>
+                <div class="d-flex gap-1 ms-2">
+                  <% if (raffle.status !== 'completed') { %>
+                    <a href="/admin/sorteos?edit=<%= raffle._id %>" class="btn btn-sm btn-outline-primary" title="Editar">
+                      <i class="bi bi-pencil-fill"></i>
+                    </a>
+                  <% } %>
+                  <% if (raffle.status === 'active') { %>
+                    <a href="/admin/sorteos/<%= raffle._id %>/ejecutar" class="btn btn-sm btn-danger" title="Ejecutar">
+                      <i class="bi bi-play-circle-fill"></i>
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-gift fs-1 mb-3 d-block"></i>
+          <p>No hay sorteos creados. ¡Crea el primero!</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

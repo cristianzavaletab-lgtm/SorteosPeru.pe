@@ -1,0 +1,27 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middlewares/authMiddleware');
+const Ticket = require('../models/Ticket');
+const Payment = require('../models/Payment');
+const Winner = require('../models/Winner');
+const Raffle = require('../models/Raffle');
+
+router.get('/dashboard', protect, async (req, res) => {
+  try {
+    const tickets = await Ticket.find({ userId: req.user._id }).populate('raffleId');
+    const payments = await Payment.find({ userId: req.user._id }).populate('raffleId');
+    const wins = await Winner.find({ userId: req.user._id }).populate('raffleId');
+    
+    // Buscar el próximo sorteo activo
+    const nextRaffle = await Raffle.findOne({ status: 'active' }).sort({ drawDate: 1 });
+    
+    res.render('dashboard', { tickets, payments, wins, nextRaffle });
+  } catch (error) {
+    res.status(500).send('Error en el dashboard');
+  }
+});
+
+router.get('/login', (req, res) => res.render('login'));
+router.get('/register', (req, res) => res.render('register'));
+
+module.exports = router;

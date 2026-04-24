@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm p-4 p-md-5 border-0">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold text-primary">Crea tu cuenta</h2>
+          <p class="text-muted">Únete para participar en nuestros sorteos</p>
+        </div>
+        
+        <form action="/auth/register" method="POST">
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-muted small fw-bold">Nombre Completo</label>
+              <input type="text" class="form-control form-control-lg bg-light border-0" name="name" required placeholder="Juan Pérez">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-muted small fw-bold">WhatsApp</label>
+              <input type="tel" class="form-control form-control-lg bg-light border-0" name="phone" required placeholder="999 999 999">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-muted small fw-bold">Correo Electrónico</label>
+              <input type="email" class="form-control form-control-lg bg-light border-0" name="email" required placeholder="tu@correo.com">
+            </div>
+            <div class="col-md-12 mb-4">
+              <label class="form-label text-muted small fw-bold">Contraseña</label>
+              <input type="password" class="form-control form-control-lg bg-light border-0" name="password" required placeholder="••••••••">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Registrarse</button>
+        </form>
+        
+        <div class="text-center mt-3">
+          <p class="text-muted small">¿Ya tienes cuenta? <a href="/login" class="fw-bold text-primary text-decoration-none">Inicia sesión</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
