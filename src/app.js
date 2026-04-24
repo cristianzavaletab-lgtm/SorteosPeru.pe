@@ -27,6 +27,9 @@ const { checkUser } = require('./middlewares/authMiddleware');
 // Add auth user to locals for views
 app.use(checkUser);
 
+// Health check (para mantener Render despierto)
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() }));
+
 // Routes
 app.use('/', require('./routes/index.routes'));
 app.use('/', require('./routes/raffle.routes'));
