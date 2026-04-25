@@ -27,15 +27,24 @@
 
           <h5 class="fw-bold mb-3">Paga con Yape/Plin</h5>
           
-          <div class="d-flex align-items-center mb-4 bg-light p-3 rounded-3 border">
-            <div class="text-white rounded px-3 py-2 me-3 text-center" style="background-color: #742284;">
-              <i class="bi bi-qr-code-scan fs-1"></i>
-              <div class="small fw-bold mt-1">YAPE / PLIN</div>
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+              <div class="bg-light p-3 rounded-3 border h-100 d-flex flex-column align-items-center justify-content-center text-center">
+                <p class="text-muted small mb-2">Escanea para pagar:</p>
+                <img src="/images/qr-pago.png" class="img-fluid rounded shadow-sm mb-2" style="max-height: 150px;">
+                <div class="badge bg-purple px-3 py-1" style="background-color: #742284;">YAPE / PLIN</div>
+              </div>
             </div>
-            <div>
-              <p class="text-muted small mb-0">Número de teléfono:</p>
-              <h3 class="fw-bold mb-0">999 999 999</h3>
-              <p class="text-muted small mb-0 mt-1">Titular: Cristian Zavaleta</p>
+            <div class="col-sm-6">
+              <div class="bg-light p-3 rounded-3 border h-100 d-flex flex-column align-items-center justify-content-center text-center">
+                <p class="text-muted small mb-1">Número de teléfono:</p>
+                <h3 class="fw-bold mb-1 text-primary">918 762 620</h3>
+                <p class="text-muted small mb-0">Titular: Cristian Zavaleta</p>
+                <hr class="w-50 my-2">
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="navigator.clipboard.writeText('918762620'); alert('Número copiado');">
+                  <i class="bi bi-clipboard me-1"></i> Copiar Número
+                </button>
+              </div>
             </div>
           </div>
 

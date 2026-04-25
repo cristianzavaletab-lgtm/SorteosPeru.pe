@@ -13,6 +13,7 @@ router.post('/pagos/:id/rechazar', adminController.rejectPayment);
 router.get('/sorteos', adminController.getRaffles);
 router.post('/sorteos', upload.single('image'), adminController.createRaffle);
 router.post('/sorteos/:id/editar', upload.single('image'), adminController.updateRaffle);
+router.post('/sorteos/:id/eliminar', adminController.deleteRaffle);
 router.get('/sorteos/:id/ejecutar', adminController.getDrawPage);
 router.post('/sorteos/:id/ejecutar', adminController.executeDraw);
 router.get('/ganadores', adminController.getWinners);

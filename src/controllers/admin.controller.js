@@ -103,8 +103,14 @@ exports.rejectPayment = async (req, res) => {
 
 exports.getRaffles = async (req, res) => {
   try {
-    const raffles = await Raffle.find().sort({ createdAt: -1 });
+    const rafflesRaw = await Raffle.find().sort({ createdAt: -1 });
     
+    // Adjuntar conteo de tickets a cada sorteo
+    const raffles = await Promise.all(rafflesRaw.map(async (r) => {
+      const ticketCount = await Ticket.countDocuments({ raffleId: r._id });
+      return { ...r.toObject(), ticketCount };
+    }));
+
     // Si viene ?edit=ID, cargar el sorteo a editar
     let editRaffle = null;
     if (req.query.edit) {
@@ -114,6 +120,20 @@ exports.getRaffles = async (req, res) => {
     res.render('admin/raffles', { raffles, editRaffle });
   } catch (error) {
     res.status(500).send('Error al obtener sorteos');
+  }
+};
+
+exports.deleteRaffle = async (req, res) => {
+  try {
+    const ticketCount = await Ticket.countDocuments({ raffleId: req.params.id });
+    if (ticketCount > 0) {
+      return res.status(400).send('No se puede eliminar un sorteo con tickets comprados');
+    }
+    
+    await Raffle.findByIdAndDelete(req.params.id);
+    res.redirect('/admin/sorteos');
+  } catch (error) {
+    res.status(500).send('Error al eliminar sorteo');
   }
 };
 

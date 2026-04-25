@@ -112,6 +112,15 @@
                       <i class="bi bi-pencil-fill"></i>
                     </a>
                   <% } %>
+                  
+                  <% if (raffle.ticketCount === 0) { %>
+                    <form action="/admin/sorteos/<%= raffle._id %>/eliminar" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este sorteo? Esta acción no se puede deshacer.');" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </form>
+                  <% } %>
+
                   <% if (raffle.status === 'active') { %>
                     <a href="/admin/sorteos/<%= raffle._id %>/ejecutar" class="btn btn-sm btn-danger" title="Ejecutar">
                       <i class="bi bi-play-circle-fill"></i>
