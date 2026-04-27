@@ -3,6 +3,7 @@ const Payment = require('../models/Payment');
 const Ticket = require('../models/Ticket');
 const Winner = require('../models/Winner');
 const User = require('../models/User');
+const exceljs = require('exceljs');
 const { generateTicketNumber } = require('../utils/generateTicket');
 const { drawRandomWinner } = require('../utils/drawWinner');
 
@@ -262,5 +263,100 @@ exports.deliverPrize = async (req, res) => {
     res.redirect('/admin/ganadores');
   } catch (error) {
     res.status(500).send('Error al actualizar entrega');
+  }
+};
+
+// --- Gestión de Usuarios ---
+
+exports.getUsers = async (req, res) => {
+  try {
+    const usersRaw = await User.find({ role: 'user' }).sort({ createdAt: -1 });
+    
+    // Obtener sorteos activos para el modal de regalar tickets
+    const activeRaffles = await Raffle.find({ status: 'active' });
+
+    const users = await Promise.all(usersRaw.map(async (u) => {
+      const ticketCount = await Ticket.countDocuments({ userId: u._id });
+      return { ...u.toObject(), ticketCount };
+    }));
+
+    res.render('admin/users', { users, activeRaffles });
+  } catch (error) {
+    res.status(500).send('Error al obtener usuarios');
+  }
+};
+
+exports.giftTickets = async (req, res) => {
+  try {
+    const { raffleId, qty } = req.body;
+    const userId = req.params.id;
+
+    if (!raffleId || !qty) return res.status(400).send('Faltan datos');
+
+    const ticketNumbers = [];
+    for (let i = 0; i < parseInt(qty); i++) {
+      const ticketNumber = await generateTicketNumber();
+      await Ticket.create({
+        userId,
+        raffleId,
+        ticketNumber,
+        status: 'valid'
+      });
+      ticketNumbers.push(ticketNumber);
+    }
+
+    res.redirect('/admin/usuarios?success=tickets_regalados');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al regalar tickets');
+  }
+};
+
+exports.exportData = async (req, res) => {
+  try {
+    const workbook = new exceljs.Workbook();
+    const sheet = workbook.addWorksheet('Registrados y Compradores');
+
+    sheet.columns = [
+      { header: 'Nombre', key: 'name', width: 25 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Teléfono', key: 'phone', width: 15 },
+      { header: 'Fecha Registro', key: 'createdAt', width: 20 },
+      { header: 'Tickets Totales', key: 'totalTickets', width: 15 },
+      { header: 'Números de Ticket', key: 'ticketNumbers', width: 50 }
+    ];
+
+    const users = await User.find({ role: 'user' });
+
+    for (const user of users) {
+      const tickets = await Ticket.find({ userId: user._id }).populate('raffleId');
+      const ticketNumbers = tickets.map(t => `${t.ticketNumber} (${t.raffleId ? t.raffleId.title : 'N/A'})`).join(', ');
+      
+      sheet.addRow({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        createdAt: user.createdAt.toLocaleDateString(),
+        totalTickets: tickets.length,
+        ticketNumbers: ticketNumbers
+      });
+    }
+
+    // Estilo para el encabezado
+    sheet.getRow(1).font = { bold: true };
+    sheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + `Reporte_SorteosPeru_${new Date().toISOString().slice(0,10)}.xlsx`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al exportar datos');
   }
 };

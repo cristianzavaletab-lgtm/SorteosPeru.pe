@@ -20,4 +20,9 @@ router.get('/ganadores', adminController.getWinners);
 router.get('/ganadores/:id', adminController.getWinner);
 router.post('/ganadores/:id/entregar', adminController.deliverPrize);
 
+// Usuarios
+router.get('/usuarios', adminController.getUsers);
+router.post('/usuarios/:id/regalar-tickets', adminController.giftTickets);
+router.get('/usuarios/exportar', adminController.exportData);
+
 module.exports = router;
