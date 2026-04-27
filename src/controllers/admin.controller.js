@@ -270,18 +270,28 @@ exports.deliverPrize = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
+    const { raffleId } = req.query;
     const usersRaw = await User.find({ role: 'user' }).sort({ createdAt: -1 });
     
-    // Obtener sorteos activos para el modal de regalar tickets
-    const activeRaffles = await Raffle.find({ status: 'active' });
+    const allRaffles = await Raffle.find().sort({ createdAt: -1 });
+    const activeRaffles = allRaffles.filter(r => r.status === 'active');
 
-    const users = await Promise.all(usersRaw.map(async (u) => {
-      const ticketCount = await Ticket.countDocuments({ userId: u._id });
+    let users = await Promise.all(usersRaw.map(async (u) => {
+      const filter = { userId: u._id };
+      if (raffleId) filter.raffleId = raffleId;
+      
+      const ticketCount = await Ticket.countDocuments(filter);
       return { ...u.toObject(), ticketCount };
     }));
 
-    res.render('admin/users', { users, activeRaffles });
+    res.render('admin/users', { 
+      users, 
+      activeRaffles, 
+      allRaffles, 
+      selectedRaffleId: raffleId 
+    });
   } catch (error) {
+    console.error("Error in getUsers:", error);
     res.status(500).send('Error al obtener usuarios');
   }
 };
@@ -314,30 +324,43 @@ exports.giftTickets = async (req, res) => {
 
 exports.exportData = async (req, res) => {
   try {
+    const { raffleId } = req.query;
     const workbook = new exceljs.Workbook();
     const sheet = workbook.addWorksheet('Registrados y Compradores');
+
+    let raffleTitle = 'Todos los sorteos';
+    if (raffleId) {
+      const raffle = await Raffle.findById(raffleId);
+      if (raffle) raffleTitle = raffle.title;
+    }
 
     sheet.columns = [
       { header: 'Nombre', key: 'name', width: 25 },
       { header: 'Email', key: 'email', width: 30 },
       { header: 'Teléfono', key: 'phone', width: 15 },
       { header: 'Fecha Registro', key: 'createdAt', width: 20 },
-      { header: 'Tickets Totales', key: 'totalTickets', width: 15 },
+      { header: 'Tickets (' + raffleTitle + ')', key: 'ticketCount', width: 20 },
       { header: 'Números de Ticket', key: 'ticketNumbers', width: 50 }
     ];
 
     const users = await User.find({ role: 'user' });
 
     for (const user of users) {
-      const tickets = await Ticket.find({ userId: user._id }).populate('raffleId');
+      const filter = { userId: user._id };
+      if (raffleId) filter.raffleId = raffleId;
+
+      const tickets = await Ticket.find(filter).populate('raffleId');
       const ticketNumbers = tickets.map(t => `${t.ticketNumber} (${t.raffleId ? t.raffleId.title : 'N/A'})`).join(', ');
       
+      // Si filtramos por sorteo, solo exportar los que tienen tickets en ese sorteo
+      if (raffleId && tickets.length === 0) continue;
+
       sheet.addRow({
         name: user.name,
         email: user.email,
         phone: user.phone,
         createdAt: user.createdAt.toLocaleDateString(),
-        totalTickets: tickets.length,
+        ticketCount: tickets.length,
         ticketNumbers: ticketNumbers
       });
     }
