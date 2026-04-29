@@ -12,9 +12,10 @@ exports.getDashboard = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const activeRaffles = await Raffle.countDocuments({ status: 'active' });
     const pendingPayments = await Payment.countDocuments({ status: 'pending' });
-    const ticketsSold = await Ticket.countDocuments({ status: 'valid' });
+    const ticketsSold = await Ticket.countDocuments({ status: 'valid', paymentId: { $ne: null } });
+    const ticketsGifted = await Ticket.countDocuments({ status: 'valid', paymentId: null });
 
-    res.render('admin/dashboard', { totalUsers, activeRaffles, pendingPayments, ticketsSold });
+    res.render('admin/dashboard', { totalUsers, activeRaffles, pendingPayments, ticketsSold, ticketsGifted });
   } catch (error) {
     res.status(500).send('Error en el panel');
   }
