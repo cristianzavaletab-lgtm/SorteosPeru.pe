@@ -17,6 +17,7 @@ const raffleSchema = new mongoose.Schema({
   startDate: { type: Date },
   endDate: { type: Date },
   drawDate: { type: Date }, // Fecha y hora exacta del sorteo
+  streamUrl: { type: String }, // Link de YouTube/Facebook/Twitch
   winnerTicketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }
 }, { timestamps: true });
 

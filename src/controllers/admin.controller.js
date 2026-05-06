@@ -9,13 +9,45 @@ const { drawRandomWinner } = require('../utils/drawWinner');
 
 exports.getDashboard = async (req, res) => {
   try {
+    const { raffleId } = req.query;
+
     const totalUsers = await User.countDocuments();
     const activeRaffles = await Raffle.countDocuments({ status: 'active' });
-    const pendingPayments = await Payment.countDocuments({ status: 'pending' });
-    const ticketsSold = await Ticket.countDocuments({ status: 'valid', paymentId: { $ne: null } });
-    const ticketsGifted = await Ticket.countDocuments({ status: 'valid', paymentId: null });
+    
+    // Filtros dinámicos
+    const paymentFilter = { status: 'pending' };
+    const ticketSoldFilter = { status: 'valid', paymentId: { $ne: null } };
+    const ticketGiftedFilter = { status: 'valid', paymentId: null };
 
-    res.render('admin/dashboard', { totalUsers, activeRaffles, pendingPayments, ticketsSold, ticketsGifted });
+    if (raffleId) {
+      paymentFilter.raffleId = raffleId;
+      ticketSoldFilter.raffleId = raffleId;
+      ticketGiftedFilter.raffleId = raffleId;
+    }
+
+    const pendingPayments = await Payment.countDocuments(paymentFilter);
+    const ticketsSold = await Ticket.countDocuments(ticketSoldFilter);
+    const ticketsGifted = await Ticket.countDocuments(ticketGiftedFilter);
+    
+    const allRaffles = await Raffle.find().sort({ createdAt: -1 });
+
+    // Estadísticas por sorteo activo
+    const activeRafflesList = await Raffle.find({ status: 'active' });
+    const raffleStats = await Promise.all(activeRafflesList.map(async (raffle) => {
+      const sold = await Ticket.countDocuments({ raffleId: raffle._id, status: 'valid', paymentId: { $ne: null } });
+      const gifted = await Ticket.countDocuments({ raffleId: raffle._id, status: 'valid', paymentId: null });
+      return {
+        title: raffle.title,
+        sold,
+        gifted,
+        revenue: sold * raffle.ticketPrice
+      };
+    }));
+
+    res.render('admin/dashboard', { 
+      totalUsers, activeRaffles, pendingPayments, ticketsSold, ticketsGifted, raffleStats,
+      allRaffles, selectedRaffleId: raffleId 
+    });
   } catch (error) {
     res.status(500).send('Error en el panel');
   }
@@ -54,6 +86,10 @@ exports.approvePayment = async (req, res) => {
       ticketNumbers.push(ticketNumber);
     }
 
+    const io = req.app.get('io');
+    io.emit('user_update', { userId: payment.userId._id, message: '¡Tu pago ha sido aprobado! Tienes nuevos tickets.' });
+    io.emit('admin_update', { message: 'Pago aprobado y tickets generados' });
+
     // Redirigir a WhatsApp con mensaje de aprobación
     const phone = payment.userId.phone.replace(/\s/g, '');
     const phoneFormatted = phone.startsWith('51') ? phone : '51' + phone;
@@ -84,6 +120,10 @@ exports.rejectPayment = async (req, res) => {
     payment.status = 'rejected';
     payment.rejectionReason = reason;
     await payment.save();
+
+    const io = req.app.get('io');
+    io.emit('user_update', { userId: payment.userId._id, message: `Tu pago fue rechazado: ${reason}` });
+    io.emit('admin_update', { message: 'Pago rechazado' });
 
     // Redirigir a WhatsApp con mensaje de rechazo
     const phone = payment.userId.phone.replace(/\s/g, '');
@@ -166,6 +206,7 @@ exports.updateRaffle = async (req, res) => {
     raffle.startDate = req.body.startDate || null;
     raffle.endDate = req.body.endDate || null;
     raffle.drawDate = req.body.drawDate || null;
+    raffle.streamUrl = req.body.streamUrl || null;
     raffle.status = req.body.status;
     
     if (req.file) {
@@ -315,6 +356,9 @@ exports.giftTickets = async (req, res) => {
       });
       ticketNumbers.push(ticketNumber);
     }
+
+    const io = req.app.get('io');
+    io.emit('user_update', { userId, message: '🎁 ¡Felicidades! Has recibido tickets de regalo del administrador.' });
 
     res.redirect('/admin/usuarios?success=tickets_regalados');
   } catch (error) {

@@ -1,47 +1,67 @@
 <%- include('partials/header') %>
 
-<div class="hero-section text-center px-3">
-  <div class="container">
-    <h1 class="hero-title mb-3">¡Gana premios reales!</h1>
-    <p class="hero-subtitle mb-4">Participa en sorteos transparentes y en vivo.</p>
-    <a href="/sorteos" class="btn btn-light btn-lg text-dark fw-bold px-5 rounded-pill shadow-sm">Jugar Ahora</a>
+<div class="hero-section px-3">
+  <div class="container position-relative z-1">
+    <span class="badge bg-secondary text-primary bg-opacity-10 rounded-pill px-3 py-2 mb-3 fw-semibold border border-primary border-opacity-25" style="backdrop-filter: blur(4px);">
+      ✨ La plataforma #1 de sorteos
+    </span>
+    <h1 class="hero-title">Gana Premios <br><span style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Extraordinarios</span></h1>
+    <p class="hero-subtitle">Participa en sorteos transparentes, en vivo y con las mejores probabilidades de ganar.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="/sorteos" class="btn btn-primary btn-lg shadow-lg">
+        <i class="bi bi-play-fill me-1"></i> Jugar Ahora
+      </a>
+      <a href="#como-funciona" class="btn btn-outline-primary btn-lg bg-transparent border-secondary text-light">
+        Saber Más
+      </a>
+    </div>
+  </div>
+  
+  <!-- Elementos decorativos de fondo -->
+  <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden" style="z-index: 0; pointer-events: none;">
+    <div class="position-absolute rounded-circle" style="width: 300px; height: 300px; background: var(--primary-color); filter: blur(100px); opacity: 0.2; top: -10%; left: -5%;"></div>
+    <div class="position-absolute rounded-circle" style="width: 250px; height: 250px; background: var(--secondary-color); filter: blur(80px); opacity: 0.15; bottom: -10%; right: 5%;"></div>
   </div>
 </div>
 
-<div class="container pb-5">
-  <div class="row mb-5">
-    <div class="col-12 text-center">
-      <h2 class="fw-bold mb-4">Cómo Funciona</h2>
+<div class="container pb-5" id="como-funciona">
+  <div class="row mb-5 pt-4">
+    <div class="col-12 text-center mb-5">
+      <h6 class="text-uppercase tracking-wider fw-bold" style="color: var(--accent-color); letter-spacing: 2px;">Proceso Simple</h6>
+      <h2 class="fw-bold mb-0" style="font-size: 2.5rem;">Cómo Funciona</h2>
     </div>
-    <div class="col-4 text-center mb-4 mb-md-0">
-      <div class="how-it-works-icon bg-white shadow-sm d-inline-flex mb-3 align-items-center justify-content-center">
-        <i class="bi bi-ticket-perforated" style="color: var(--accent-color);"></i>
+    
+    <div class="col-md-4 text-center mb-4 mb-md-0 how-it-works-step">
+      <div class="how-it-works-icon shadow-lg">
+        <i class="bi bi-ticket-perforated"></i>
       </div>
-      <h6 class="fw-bold how-it-works-title">1. Elige tu Sorteo</h6>
-      <p class="text-muted how-it-works-text">Selecciona el sorteo en el que deseas participar y compra tu entrada.</p>
+      <h5 class="fw-bold mb-3">1. Elige tu Sorteo</h5>
+      <p class="text-muted px-3">Explora nuestra cartelera de sorteos activos y selecciona el premio de tus sueños.</p>
     </div>
-    <div class="col-4 text-center mb-4 mb-md-0">
-      <div class="how-it-works-icon bg-white shadow-sm d-inline-flex mb-3 align-items-center justify-content-center">
-        <i class="bi bi-phone-vibrate" style="color: var(--accent-color);"></i>
+    
+    <div class="col-md-4 text-center mb-4 mb-md-0 how-it-works-step">
+      <div class="how-it-works-icon shadow-lg">
+        <i class="bi bi-phone-vibrate"></i>
       </div>
-      <h6 class="fw-bold how-it-works-title">2. Paga con Yape/Plin</h6>
-      <p class="text-muted how-it-works-text">Sube tu comprobante de pago seguro y recibe tu ticket automático.</p>
+      <h5 class="fw-bold mb-3">2. Paga con Yape/Plin</h5>
+      <p class="text-muted px-3">Realiza tu pago 100% seguro escaneando el QR y sube tu comprobante en segundos.</p>
     </div>
-    <div class="col-4 text-center">
-      <div class="how-it-works-icon bg-white shadow-sm d-inline-flex mb-3 align-items-center justify-content-center">
-        <i class="bi bi-gift" style="color: var(--accent-color);"></i>
+    
+    <div class="col-md-4 text-center how-it-works-step">
+      <div class="how-it-works-icon shadow-lg">
+        <i class="bi bi-gift"></i>
       </div>
-      <h6 class="fw-bold how-it-works-title">3. Gana en Vivo</h6>
-      <p class="text-muted how-it-works-text">Mira el sorteo en vivo y descubre si eres el afortunado ganador.</p>
+      <h5 class="fw-bold mb-3">3. Gana en Vivo</h5>
+      <p class="text-muted px-3">Sintoniza nuestras transmisiones en vivo y descubre si tu ticket es el afortunado ganador.</p>
     </div>
   </div>
 
-  <div class="row mb-4 align-items-center">
+  <div class="row mb-4 mt-5 align-items-end">
     <div class="col">
-      <h2 class="fw-bold mb-0">Sorteos Activos</h2>
+      <h2 class="fw-bold mb-0">Sorteos Activos <span class="badge bg-danger ms-2 align-middle fs-6" style="animation: pulse 2s infinite;">Live</span></h2>
     </div>
     <div class="col-auto">
-      <a href="/sorteos" class="text-decoration-none fw-bold" style="color: var(--accent-color);">Ver todos <i class="bi bi-arrow-right"></i></a>
+      <a href="/sorteos" class="text-decoration-none fw-bold hover-lift d-inline-block" style="color: var(--accent-color);">Ver todos <i class="bi bi-arrow-right ms-1"></i></a>
     </div>
   </div>
 
@@ -49,38 +69,108 @@
     <% if (activeRaffles && activeRaffles.length > 0) { %>
       <% activeRaffles.slice(0,3).forEach(raffle => { %>
         <div class="col-md-6 col-lg-4">
-          <div class="card h-100 overflow-hidden shadow-sm border-0">
-            <% if (raffle.image) { %>
-              <img src="<%= raffle.image %>" style="height: 160px; object-fit: cover;" class="card-img-top">
-            <% } else { %>
-              <div class="d-flex align-items-center justify-content-center" style="height: 160px; background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));">
-                <i class="bi bi-gift text-white" style="font-size: 3rem;"></i>
-              </div>
-            <% } %>
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h5 class="card-title fw-bold mb-0"><%= raffle.title %></h5>
-                <span class="badge rounded-pill px-3 py-2" style="background-color: var(--accent-color);">S/<%= raffle.ticketPrice.toFixed(2) %></span>
-              </div>
-              <p class="text-muted small mb-2">Premio: <strong class="text-dark">S/<%= raffle.prizeValue.toFixed(2) %></strong></p>
-              <% if (raffle.drawDate) { %>
-                <p class="small mb-3">
-                  <i class="bi bi-calendar-event" style="color: var(--accent-color);"></i>
-                  <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'short', day:'2-digit', month:'short'}) %> -
-                  <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %>
-                </p>
+          <div class="card h-100 border-0">
+            <div class="position-relative">
+              <% if (raffle.image) { %>
+                <img src="<%= raffle.image %>" style="height: 200px; object-fit: cover;" class="card-img-top">
+              <% } else { %>
+                <div class="d-flex align-items-center justify-content-center card-img-top" style="height: 200px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2)); border-bottom: 1px solid var(--card-border);">
+                  <i class="bi bi-gift text-white opacity-50" style="font-size: 4rem;"></i>
+                </div>
               <% } %>
-              <a href="/sorteos/<%= raffle._id %>" class="btn btn-outline-primary w-100">Participar Ahora</a>
+              <div class="position-absolute top-0 end-0 m-3">
+                <span class="badge px-3 py-2 shadow-sm" style="background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); border: 1px solid var(--card-border); color: var(--accent-color);">
+                  <i class="bi bi-tag-fill me-1"></i> S/<%= raffle.ticketPrice.toFixed(2) %>
+                </span>
+              </div>
+            </div>
+            
+            <div class="card-body p-4 d-flex flex-column">
+              <h4 class="card-title fw-bold mb-3"><%= raffle.title %></h4>
+              
+              <div class="bg-light rounded-3 p-3 mb-4">
+                <p class="text-muted small mb-1 text-uppercase fw-semibold tracking-wider">Valor del Premio</p>
+                <h3 class="mb-0 text-success fw-bold">S/<%= raffle.prizeValue.toFixed(2) %></h3>
+              </div>
+              
+              <% if (raffle.drawDate) { %>
+                <div class="d-flex align-items-center mb-4 text-muted">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); color: var(--primary-color);">
+                    <i class="bi bi-calendar-event fs-5"></i>
+                  </div>
+                  <div>
+                    <p class="mb-0 fw-semibold text-light"><%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long'}) %></p>
+                    <p class="mb-0 small"><%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %></p>
+                  </div>
+                </div>
+              <% } %>
+              
+              <div class="mt-auto pt-2">
+                <a href="/sorteos/<%= raffle._id %>" class="btn btn-primary w-100">
+                  Participar Ahora <i class="bi bi-arrow-right-circle ms-1"></i>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       <% }) %>
     <% } else { %>
-      <div class="col-12 text-center text-muted">
-        <p>No hay sorteos activos en este momento.</p>
+      <div class="col-12 text-center py-5">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: rgba(255,255,255,0.05);">
+          <i class="bi bi-clock-history fs-1 text-muted"></i>
+        </div>
+        <h4 class="fw-bold">Próximamente</h4>
+        <p class="text-muted">Estamos preparando nuevos sorteos. ¡Vuelve pronto!</p>
       </div>
     <% } %>
   </div>
+
+  <!-- SECCIÓN DE GANADORES RECIENTES -->
+  <% if (winners && winners.length > 0) { %>
+    <div class="row mt-5 pt-4">
+      <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold mb-0">Nuestros Ganadores 🏆</h2>
+        <p class="text-muted">Transparencia total en cada sorteo.</p>
+      </div>
+      <div class="col-12">
+        <div class="row justify-content-center g-3">
+          <% winners.forEach(winner => { %>
+            <div class="col-md-6 col-lg-4">
+              <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(to bottom right, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.1) !important;">
+                <div class="card-body p-4 text-center">
+                  <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem; background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #fff;">
+                    <%= winner.userId ? winner.userId.name.charAt(0).toUpperCase() : '?' %>
+                  </div>
+                  <h5 class="fw-bold mb-1"><%= winner.userId ? winner.userId.name : 'Usuario Anónimo' %></h5>
+                  <p class="small text-muted mb-3"><%= winner.raffleId ? winner.raffleId.title : 'Sorteo finalizado' %></p>
+                  
+                  <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                    <span class="badge bg-secondary text-light">Ticket:</span>
+                    <span class="fw-bold" style="filter: blur(4px); user-select: none; opacity: 0.7;" title="Ticket oculto por privacidad"><%= winner.ticketId ? winner.ticketId.ticketNumber : 'GC-XXXXXX' %></span>
+                  </div>
+
+                  <div class="bg-success bg-opacity-10 text-success fw-bold p-2 rounded-3">
+                    Ganó S/<%= winner.prizeValue.toFixed(2) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  <% } %>
 </div>
+
+<style>
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .tracking-wider { letter-spacing: 0.05em; }
+  .hover-lift { transition: transform 0.2s ease; }
+  .hover-lift:hover { transform: translateY(-2px); }
+</style>
 
 <%- include('partials/footer') %>

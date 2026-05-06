@@ -1,151 +1,194 @@
 <%- include('partials/header') %>
 
-<div class="container py-4">
+<div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="text-center mb-4">
-        <a href="/sorteos/<%= raffle._id %>" class="text-decoration-none text-muted d-block mb-2">
-          <i class="bi bi-arrow-left"></i> Volver al sorteo
+    <div class="col-md-10 col-lg-8">
+      <div class="mb-4">
+        <a href="/sorteos/<%= raffle._id %>" class="btn btn-outline-secondary border-0 text-muted hover-lift">
+          <i class="bi bi-arrow-left me-2"></i> Volver al sorteo
         </a>
       </div>
 
       <% if (closed) { %>
-        <div class="card border-0 shadow-sm p-5 text-center">
-          <i class="bi bi-lock-fill text-danger" style="font-size: 4rem;"></i>
-          <h3 class="fw-bold mt-3 text-danger">Sorteo Cerrado</h3>
-          <p class="text-muted">Este sorteo ya no acepta compras de tickets.</p>
-          <a href="/sorteos" class="btn btn-primary">Ver Otros Sorteos</a>
+        <div class="card border-0 p-5 text-center shadow-lg" style="background: rgba(220, 38, 38, 0.05); border: 1px solid rgba(220, 38, 38, 0.2) !important;">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mx-auto mb-4" style="width: 100px; height: 100px; background: rgba(220, 38, 38, 0.1);">
+            <i class="bi bi-lock-fill text-danger" style="font-size: 3rem;"></i>
+          </div>
+          <h2 class="fw-bold text-danger mb-3">Sorteo Cerrado</h2>
+          <p class="text-muted fs-5 mb-4">Este sorteo ya no acepta nuevas participaciones.</p>
+          <a href="/sorteos" class="btn btn-primary btn-lg rounded-pill px-5">Explorar Sorteos Activos</a>
         </div>
       <% } else { %>
-        <div class="card border-0 shadow-sm p-4">
-          <!-- Resumen de compra -->
-          <div class="bg-primary text-white rounded-3 p-3 mb-4 text-center">
-            <p class="small mb-1 opacity-75"><%= raffle.title %></p>
-            <h3 class="fw-bold mb-1"><%= qty %> ticket<%= qty > 1 ? 's' : '' %></h3>
-            <h2 class="fw-bold mb-0">Total: S/<%= totalAmount.toFixed(2) %></h2>
-          </div>
-
-          <h5 class="fw-bold mb-3">Paga con Yape/Plin</h5>
-          
-          <div class="row g-3 mb-4">
-            <div class="col-sm-6">
-              <div class="bg-light p-3 rounded-3 border h-100 d-flex flex-column align-items-center justify-content-center text-center">
-                <p class="text-muted small mb-2">Escanea para pagar:</p>
-                <img src="/images/qr-pago.png" class="img-fluid rounded shadow-sm mb-2" style="max-height: 150px;">
-                <div class="badge bg-purple px-3 py-1" style="background-color: #742284;">YAPE / PLIN</div>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="bg-light p-3 rounded-3 border h-100 d-flex flex-column align-items-center justify-content-center text-center">
-                <p class="text-muted small mb-1">Número de teléfono:</p>
-                <h3 class="fw-bold mb-1 text-primary">918 762 620</h3>
-                <p class="text-muted small mb-0">Titular: Cristian Zavaleta</p>
-                <hr class="w-50 my-2">
-                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="navigator.clipboard.writeText('918762620'); alert('Número copiado');">
-                  <i class="bi bi-clipboard me-1"></i> Copiar Número
-                </button>
+        <div class="card border-0 shadow-lg p-0 overflow-hidden">
+          <!-- Resumen de compra Header -->
+          <div class="bg-primary bg-gradient text-white p-5 text-center position-relative" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            
+            <div class="position-relative z-1">
+              <span class="badge bg-white text-primary rounded-pill px-3 py-1 mb-3 fw-bold tracking-wider text-uppercase">Resumen de Compra</span>
+              <h3 class="fw-bold mb-2 text-white"><%= raffle.title %></h3>
+              <p class="fs-5 mb-3 text-white-50"><%= qty %> ticket<%= qty > 1 ? 's' : '' %></p>
+              <div class="d-inline-block bg-white bg-opacity-25 rounded-pill px-4 py-2 backdrop-blur">
+                <h1 class="fw-bold mb-0 text-white display-5">S/<%= totalAmount.toFixed(2) %></h1>
               </div>
             </div>
           </div>
 
-          <div class="alert alert-info small py-2 mb-3">
-            <i class="bi bi-info-circle-fill"></i> 
-            Envía exactamente <strong>S/<%= totalAmount.toFixed(2) %></strong> por Yape o Plin y sube la captura abajo.
-          </div>
-
-          <% if (raffle.drawDate) { %>
-            <div class="alert alert-warning small py-2 mb-3">
-              <i class="bi bi-exclamation-triangle-fill"></i> 
-              Las compras se cierran 1 minuto antes del sorteo:
-              <strong><%= raffle.drawDate.toLocaleDateString('es-PE', {day:'2-digit', month:'short'}) %> a las <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %></strong>
-            </div>
-          <% } %>
-
-          <form action="/pagos/<%= raffle._id %>/subir-comprobante" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-              <label class="form-label text-muted small fw-bold">Método de Pago</label>
-              <select class="form-select bg-light border-0" name="paymentMethod" required>
-                <option value="yape">Yape</option>
-                <option value="plin">Plin</option>
-              </select>
-            </div>
-
-            <input type="hidden" name="amount" value="<%= totalAmount %>">
-            <input type="hidden" name="ticketQty" value="<%= qty %>">
-
-            <div class="mb-4">
-              <div id="uploadZone" class="border border-2 border-dashed rounded-3 p-4 text-center bg-light position-relative" style="cursor: pointer;">
-                <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-2" id="uploadIcon"></i>
-                <h6 class="fw-bold text-dark" id="uploadText">Toca para Subir Comprobante</h6>
-                <p class="text-muted small mb-0" id="uploadHint">Formatos: JPG, PNG (Max 5MB)</p>
-                <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;" name="receipt" id="receiptInput" required accept="image/png, image/jpeg">
+          <div class="p-4 p-md-5">
+            <h4 class="fw-bold mb-4 text-center">Realiza tu pago seguro</h4>
+            
+            <div class="row g-4 mb-5">
+              <div class="col-md-6">
+                <div class="bg-light p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
+                  <div class="badge bg-primary px-3 py-2 mb-3 rounded-pill fw-bold" style="background: linear-gradient(135deg, #742284, #00d3a5) !important;">
+                    <i class="bi bi-qr-code-scan me-1"></i> YAPE / PLIN
+                  </div>
+                  <img src="/images/qr-pago.png" class="img-fluid rounded-3 shadow mb-3" style="max-height: 180px; border: 4px solid white;">
+                  <p class="text-muted small mb-0 fw-medium">Escanea desde tu app bancaria</p>
+                </div>
               </div>
-
-              <div id="previewContainer" class="mt-3 d-none">
-                <div class="position-relative d-inline-block w-100">
-                  <img id="previewImage" src="" class="img-fluid rounded-3 border shadow-sm w-100" style="max-height: 350px; object-fit: contain; background: #f1f5f9;">
-                  <button type="button" id="removeBtn" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle" style="width: 32px; height: 32px; padding: 0;">
-                    <i class="bi bi-x-lg"></i>
+              <div class="col-md-6">
+                <div class="bg-light p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
+                  <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-phone text-primary fs-3"></i>
+                  </div>
+                  <p class="text-muted small mb-1 text-uppercase tracking-wider">Número Oficial</p>
+                  <h2 class="fw-bold mb-2 text-primary" style="letter-spacing: 2px;">918 762 620</h2>
+                  <p class="text-muted fw-medium mb-4">Titular: Cristian Zavaleta</p>
+                  
+                  <button type="button" class="btn btn-outline-primary rounded-pill px-4" onclick="navigator.clipboard.writeText('918762620'); const icon = this.querySelector('i'); icon.className='bi bi-check2 me-2'; this.innerHTML = '<i class=\'bi bi-check-lg me-2\'></i>¡Copiado!'; setTimeout(() => { this.innerHTML = '<i class=\'bi bi-files me-2\'></i>Copiar Número'; }, 2000);">
+                    <i class="bi bi-files me-2"></i> Copiar Número
                   </button>
                 </div>
-                <p class="text-success small mt-2 mb-0"><i class="bi bi-check-circle-fill"></i> Comprobante cargado.</p>
               </div>
-
-              <p class="text-muted" style="font-size: 0.75rem; margin-top: 0.5rem;">La captura debe mostrar claramente los detalles de la transacción.</p>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg w-100">
-              <i class="bi bi-send-fill me-2"></i> Enviar Comprobante
-            </button>
-          </form>
+            <div class="alert alert-info border-0 rounded-4 d-flex align-items-center mb-4 p-4 shadow-sm" style="background: rgba(99, 102, 241, 0.1);">
+              <i class="bi bi-info-circle-fill fs-2 text-primary me-3"></i> 
+              <div>
+                <h6 class="fw-bold text-primary mb-1">Instrucciones Importantes</h6>
+                <p class="mb-0 text-muted small">Transfiere exactamente <strong class="text-light">S/<%= totalAmount.toFixed(2) %></strong>. Tomar captura de pantalla de la confirmación exitosa.</p>
+              </div>
+            </div>
 
-          <script>
-            const receiptInput = document.getElementById('receiptInput');
-            const previewContainer = document.getElementById('previewContainer');
-            const previewImage = document.getElementById('previewImage');
-            const uploadIcon = document.getElementById('uploadIcon');
-            const uploadText = document.getElementById('uploadText');
-            const uploadHint = document.getElementById('uploadHint');
-            const uploadZone = document.getElementById('uploadZone');
-            const removeBtn = document.getElementById('removeBtn');
+            <% if (raffle.drawDate) { %>
+              <div class="alert alert-warning border-0 rounded-4 d-flex align-items-center mb-5 p-4 shadow-sm" style="background: rgba(245, 158, 11, 0.1);">
+                <i class="bi bi-clock-history fs-2 text-warning me-3"></i> 
+                <div>
+                  <h6 class="fw-bold text-warning mb-1">Cierre de Ventas</h6>
+                  <p class="mb-0 text-muted small">Se aceptan comprobantes hasta el <strong class="text-light"><%= raffle.drawDate.toLocaleDateString('es-PE', {day:'2-digit', month:'long'}) %> a las <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %></strong></p>
+                </div>
+              </div>
+            <% } %>
 
-            receiptInput.addEventListener('change', function(e) {
-              const file = e.target.files[0];
-              if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                  alert('La imagen no puede pesar más de 5MB');
-                  receiptInput.value = '';
-                  return;
+            <hr class="border-secondary opacity-25 mb-5">
+
+            <form action="/pagos/<%= raffle._id %>/subir-comprobante" method="POST" enctype="multipart/form-data" class="needs-validation">
+              <h4 class="fw-bold mb-4 text-center">Confirma tu Participación</h4>
+              
+              <div class="row mb-4 justify-content-center">
+                <div class="col-md-8">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wider ms-2">Aplicación Usada</label>
+                  <select class="form-select form-select-lg shadow-sm" name="paymentMethod" required>
+                    <option value="" disabled selected>Selecciona una opción...</option>
+                    <option value="yape">Yape</option>
+                    <option value="plin">Plin</option>
+                  </select>
+                </div>
+              </div>
+
+              <input type="hidden" name="amount" value="<%= totalAmount %>">
+              <input type="hidden" name="ticketQty" value="<%= qty %>">
+
+              <div class="row justify-content-center mb-5">
+                <div class="col-md-8">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wider ms-2">Comprobante de Pago</label>
+                  <div id="uploadZone" class="border border-2 border-dashed rounded-4 p-5 text-center bg-light position-relative transition-all hover-lift" style="cursor: pointer; border-color: var(--primary-color) !important;">
+                    <i class="bi bi-cloud-arrow-up text-primary mb-3 d-block" id="uploadIcon" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold text-light mb-2" id="uploadText">Sube tu captura aquí</h5>
+                    <p class="text-muted small mb-0" id="uploadHint">Formatos soportados: JPG, PNG (Max 5MB)</p>
+                    <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;" name="receipt" id="receiptInput" required accept="image/png, image/jpeg">
+                  </div>
+
+                  <div id="previewContainer" class="mt-4 d-none">
+                    <div class="card bg-dark border-secondary rounded-4 overflow-hidden shadow-lg">
+                      <div class="card-header bg-transparent border-bottom border-secondary d-flex justify-content-between align-items-center py-3">
+                        <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Comprobante Listo</span>
+                        <button type="button" id="removeBtn" class="btn btn-sm btn-outline-danger rounded-circle p-1 lh-1" style="width: 28px; height: 28px;">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </div>
+                      <div class="card-body p-0 text-center bg-black">
+                        <img id="previewImage" src="" class="img-fluid w-100" style="max-height: 400px; object-fit: contain;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow-lg fs-5 fw-bold w-100 w-md-auto" id="submitBtn">
+                  <i class="bi bi-send-fill me-2"></i> Validar Participación
+                </button>
+                <p class="text-muted small mt-3"><i class="bi bi-shield-check text-success me-1"></i> Transacción segura verificada manualmente</p>
+              </div>
+            </form>
+
+            <script>
+              const receiptInput = document.getElementById('receiptInput');
+              const previewContainer = document.getElementById('previewContainer');
+              const previewImage = document.getElementById('previewImage');
+              const uploadIcon = document.getElementById('uploadIcon');
+              const uploadText = document.getElementById('uploadText');
+              const uploadHint = document.getElementById('uploadHint');
+              const uploadZone = document.getElementById('uploadZone');
+              const removeBtn = document.getElementById('removeBtn');
+              const submitBtn = document.getElementById('submitBtn');
+
+              receiptInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                  if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen no puede pesar más de 5MB');
+                    receiptInput.value = '';
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = function(event) {
+                    previewImage.src = event.target.result;
+                    previewContainer.classList.remove('d-none');
+                    uploadZone.classList.add('d-none');
+                  };
+                  reader.readAsDataURL(file);
                 }
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                  previewImage.src = event.target.result;
-                  previewContainer.classList.remove('d-none');
-                  uploadIcon.className = 'bi bi-check-circle-fill fs-1 text-success mb-2';
-                  uploadText.textContent = file.name;
-                  uploadText.classList.replace('text-dark', 'text-success');
-                  uploadHint.textContent = 'Clic para cambiar imagen';
-                  uploadZone.classList.replace('border-dashed', 'border-success');
-                };
-                reader.readAsDataURL(file);
-              }
-            });
+              });
 
-            removeBtn.addEventListener('click', function() {
-              receiptInput.value = '';
-              previewContainer.classList.add('d-none');
-              previewImage.src = '';
-              uploadIcon.className = 'bi bi-cloud-arrow-up fs-1 text-muted mb-2';
-              uploadText.textContent = 'Toca para Subir Comprobante';
-              uploadText.classList.replace('text-success', 'text-dark');
-              uploadHint.textContent = 'Formatos: JPG, PNG (Max 5MB)';
-              uploadZone.classList.replace('border-success', 'border-dashed');
-            });
-          </script>
+              removeBtn.addEventListener('click', function() {
+                receiptInput.value = '';
+                previewContainer.classList.add('d-none');
+                uploadZone.classList.remove('d-none');
+                previewImage.src = '';
+              });
+
+              document.querySelector('form').addEventListener('submit', function() {
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando...';
+                submitBtn.disabled = true;
+              });
+            </script>
+          </div>
         </div>
       <% } %>
     </div>
   </div>
 </div>
+
+<style>
+  .border-dashed { border-style: dashed !important; }
+  .tracking-wider { letter-spacing: 0.05em; }
+  .backdrop-blur { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .hover-lift { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .hover-lift:hover { transform: translateY(-5px); }
+  .transition-all { transition: all 0.3s ease; }
+</style>
 
 <%- include('partials/footer') %>

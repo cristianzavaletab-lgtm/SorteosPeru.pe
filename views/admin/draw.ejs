@@ -181,7 +181,12 @@
   </div>
 </div>
 
+<!-- Socket.io y Canvas Confetti -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <script>
+  const socket = io();
   const container = document.getElementById('slotContainer');
   const ticketsData = JSON.parse(container.dataset.tickets);
   const raffleId = container.dataset.raffleId;
@@ -276,6 +281,7 @@
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
         winnerData = data.winner;
+        // socket emission moved to runSpin        
         runSpin(true);
       } catch (err) {
         alert(err.message || 'Error al conectar');
@@ -290,7 +296,11 @@
 
   function runSpin(isFinal) {
     const strip = buildStrip(isFinal ? winnerData : null);
-    const duration = isFinal ? 5000 : 2000;
+    
+    const isPenultimate = currentSpin === totalSpins - 1;
+    let duration = 2000; // Giros iniciales normales
+    if (isPenultimate) duration = 6000;  // Penúltimo giro (mucho suspenso)
+    if (isFinal) duration = 11000;       // Último giro (máximo suspenso)
     
     // Reset position sin transición
     slotStrip.style.transition = 'none';
@@ -303,9 +313,11 @@
     let targetIndex;
     if (isFinal) {
       targetIndex = winnerData.landingIndex;
+      socket.emit('admin_spin_final', { raffleId, currentSpin, totalSpins, winner: winnerData, stripItems: strip, targetIndex });
     } else {
       // Girar hasta casi el final de la tira aleatoria
       targetIndex = visibleItems - 15 + Math.floor(Math.random() * 10);
+      socket.emit('admin_spin', { raffleId, currentSpin, totalSpins, isFinal: false, stripItems: strip, targetIndex });
     }
 
     // Aterrizaje exacto: centrar el item en el puntero
@@ -348,8 +360,5 @@
     }, 1000);
   }
 </script>
-
-<!-- Canvas Confetti Library -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <%- include('../partials/footer') %>

@@ -1,0 +1,240 @@
+<%- include('partials/header') %>
+
+<style>
+  .gradient-bg {
+    background: linear-gradient(135deg, #1e1b4b, #4c1d95, #db2777);
+    color: white;
+  }
+  .slot-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    height: 320px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 6px solid #f59e0b;
+    box-shadow: 0 15px 40px rgba(245, 158, 11, 0.4);
+    background: #fff;
+    perspective: 1000px;
+    display: none; /* Oculto hasta que el admin inicie */
+  }
+  
+  .slot-container::before,
+  .slot-container::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 120px; z-index: 10; pointer-events: none;
+  }
+  .slot-container::before { background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); top: 0; }
+  .slot-container::after { background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); bottom: 0; }
+  
+  .slot-pointer {
+    position: absolute; top: 50%; left: 0; right: 0; height: 70px; margin-top: -35px;
+    border-top: 4px solid #db2777; border-bottom: 4px solid #db2777; background: rgba(219, 39, 119, 0.1);
+    z-index: 15; pointer-events: none; display: flex; align-items: center; justify-content: space-between;
+  }
+  .slot-pointer::before { content: '▶'; color: #db2777; font-size: 1.5rem; margin-left: -15px; }
+  .slot-pointer::after { content: '◀'; color: #db2777; font-size: 1.5rem; margin-right: -15px; }
+  
+  .slot-strip { position: absolute; top: 0; left: 0; width: 100%; transition: transform 0.1s linear; will-change: transform; }
+  .slot-item {
+    height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.1rem; color: #1e1b4b; border-bottom: 1px solid rgba(0,0,0,0.05); transition: filter 0.3s;
+  }
+  .slot-item .ticket-num { font-size: 0.75rem; color: #db2777; background: rgba(219, 39, 119, 0.1); padding: 1px 8px; border-radius: 10px; margin-top: 2px; }
+  .spinning .slot-item { filter: blur(1.5px); }
+
+  .waiting-msg {
+    animation: pulse 2s infinite alternate;
+  }
+  @keyframes pulse { from { opacity: 0.7; } to { opacity: 1; } }
+
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .video-container iframe {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border: 0;
+  }
+  
+  .winner-card { display: none; animation: winnerShow 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .winner-card.show { display: block; }
+  @keyframes winnerShow { from { opacity: 0; transform: scale(0.5) translateY(50px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+</style>
+
+<div class="gradient-bg py-5 min-vh-100">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold text-warning mb-1">🔴 TRANSMISIÓN EN VIVO</h1>
+      <h3 class="mb-0"><%= raffle.title %></h3>
+      <p class="fs-5 opacity-75 mt-2">Premio: <strong>S/<%= raffle.prizeValue %></strong></p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        
+        <!-- REPRODUCTOR DE VIDEO (Si hay streamUrl) -->
+        <% if (raffle.streamUrl) { %>
+          <div class="video-container mb-5">
+            <% 
+              let embedUrl = raffle.streamUrl;
+              if (raffle.streamUrl.includes('youtube.com/watch?v=')) {
+                embedUrl = raffle.streamUrl.replace('watch?v=', 'embed/');
+              } else if (raffle.streamUrl.includes('youtu.be/')) {
+                embedUrl = raffle.streamUrl.replace('youtu.be/', 'youtube.com/embed/');
+              }
+            %>
+            <iframe src="<%= embedUrl %>" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        <% } %>
+
+        <!-- ESTADO DE LA RULETA -->
+        <div class="card bg-white text-dark shadow-lg rounded-4 p-4 text-center" id="rouletteSection">
+          
+          <div id="waitingState" class="waiting-msg py-5">
+            <div style="font-size: 4rem;">⏳</div>
+            <h4 class="fw-bold mt-3">Esperando al administrador...</h4>
+            <p class="text-muted">El sorteo comenzará pronto. ¡Mantén esta pantalla abierta!</p>
+          </div>
+
+          <!-- RULETA SINCRONIZADA -->
+          <div class="slot-container mx-auto" id="slotContainer" data-tickets='<%- JSON.stringify(tickets.map(t => ({ number: t.ticketNumber, name: t.userId.name }))) %>'>
+            <div class="slot-pointer"></div>
+            <div class="slot-strip" id="slotStrip"></div>
+          </div>
+
+          <h5 id="spinStatusText" class="mt-4 fw-bold text-primary d-none">¡El administrador está girando la ruleta!</h5>
+        </div>
+
+        <!-- GANADOR -->
+        <div class="card border-0 shadow-lg p-5 mt-4 winner-card text-center bg-white text-dark" id="winnerCard">
+          <div class="mb-3" style="font-size: 6rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🏆</div>
+          <h2 class="fw-bold mb-1 text-warning">¡Tenemos un Ganador!</h2>
+          <p class="text-muted mb-4">El sorteo ha finalizado con éxito.</p>
+          
+          <div class="bg-primary bg-opacity-10 border border-primary border-opacity-25 p-4 rounded-4 mb-4">
+            <h1 class="fw-bold text-primary mb-1" id="winnerName" style="font-size: 2.5rem;"></h1>
+            <div class="d-flex justify-content-center gap-2 mb-3">
+              <span class="badge bg-primary fs-5 px-3 py-2" id="winnerTicket"></span>
+            </div>
+            <h4 class="fw-bold text-dark" id="winnerPrize"></h4>
+          </div>
+          
+          <a href="/dashboard" class="btn btn-outline-primary rounded-pill px-4">Ir a mi Panel</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Socket.io y Canvas Confetti -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+  const socket = io();
+  const raffleId = "<%= raffle._id %>";
+  
+  // Unirse a la sala
+  socket.emit('join_raffle', raffleId);
+
+  const container = document.getElementById('slotContainer');
+  const waitingState = document.getElementById('waitingState');
+  const spinStatusText = document.getElementById('spinStatusText');
+  const winnerCard = document.getElementById('winnerCard');
+  const rouletteSection = document.getElementById('rouletteSection');
+  
+  const ticketsData = JSON.parse(container.dataset.tickets);
+  const slotStrip = document.getElementById('slotStrip');
+  const itemHeight = 70;
+  const visibleItems = 150;
+
+  function buildStripFromData(stripItems) {
+    slotStrip.innerHTML = '';
+    stripItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'slot-item';
+      div.innerHTML = `<div>${item.name}</div><div class="ticket-num">${item.number}</div>`;
+      slotStrip.appendChild(div);
+    });
+  }
+
+  // Recibir giros del administrador
+  socket.on('user_spin', (data) => {
+    // Mostrar la ruleta si estaba oculta
+    if (container.style.display !== 'block') {
+      waitingState.style.display = 'none';
+      container.style.display = 'block';
+      spinStatusText.classList.remove('d-none');
+    }
+
+    const { currentSpin, totalSpins, isFinal } = data;
+    spinStatusText.textContent = isFinal ? '¡ÚLTIMO GIRO! ¡MUCHA SUERTE A TODOS!' : `Giro ${currentSpin} de ${totalSpins}...`;
+
+    container.classList.add('spinning');
+    
+    // Tiempos idénticos al admin
+    const isPenultimate = currentSpin === totalSpins - 1;
+    let duration = 2000;
+    if (isPenultimate) duration = 6000;
+    if (isFinal) duration = 11000;
+
+    // Usar los datos EXACTOS del administrador para que todos vean lo mismo
+    buildStripFromData(data.stripItems);
+    runAnimation(duration, data.targetIndex);
+  });
+
+  socket.on('user_spin_final', (data) => {
+    if (container.style.display !== 'block') {
+      waitingState.style.display = 'none';
+      container.style.display = 'block';
+    }
+    spinStatusText.textContent = '¡ÚLTIMO GIRO! ¡MUCHA SUERTE A TODOS!';
+    spinStatusText.classList.remove('d-none');
+    container.classList.add('spinning');
+    
+    const duration = 11000;
+    buildStripFromData(data.stripItems);
+
+    runAnimation(duration, data.targetIndex, () => {
+      launchEffects(data.winner);
+    });
+  });
+
+  function runAnimation(duration, targetIndex, onComplete = null) {
+    slotStrip.style.transition = 'none';
+    slotStrip.style.transform = 'translateY(0)';
+    slotStrip.offsetHeight; // reflow
+
+    const containerHeight = container.offsetHeight;
+    const offset = (targetIndex * itemHeight) - (containerHeight / 2) + (itemHeight / 2);
+
+    slotStrip.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0, 0.15, 1)`;
+    slotStrip.style.transform = `translateY(-${offset}px)`;
+
+    setTimeout(() => {
+      container.classList.remove('spinning');
+      if (onComplete) onComplete();
+    }, duration + 200);
+  }
+
+  function launchEffects(winner) {
+    confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ['#db2777', '#f59e0b', '#4c1d95'] });
+    setTimeout(() => {
+      document.getElementById('winnerName').textContent = winner.name;
+      document.getElementById('winnerTicket').textContent = `Ticket: ${winner.ticketNumber}`;
+      document.getElementById('winnerPrize').textContent = `Premio: S/${winner.prize}`;
+      winnerCard.classList.add('show');
+      rouletteSection.style.display = 'none';
+    }, 1000);
+  }
+</script>
+
+<%- include('partials/footer') %>

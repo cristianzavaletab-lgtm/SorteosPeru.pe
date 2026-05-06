@@ -12,10 +12,13 @@ router.get('/dashboard', protect, async (req, res) => {
     const payments = await Payment.find({ userId: req.user._id }).populate('raffleId');
     const wins = await Winner.find({ userId: req.user._id }).populate('raffleId');
     
+    // Obtener últimos ganadores globales para dar confianza
+    const recentWinners = await Winner.find({}).populate('userId').populate('raffleId').populate('ticketId').sort({ createdAt: -1 }).limit(3);
+    
     // Buscar el próximo sorteo activo
     const nextRaffle = await Raffle.findOne({ status: 'active' }).sort({ drawDate: 1 });
     
-    res.render('dashboard', { tickets, payments, wins, nextRaffle });
+    res.render('dashboard', { tickets, payments, wins, nextRaffle, recentWinners });
   } catch (error) {
     res.status(500).send('Error en el dashboard');
   }

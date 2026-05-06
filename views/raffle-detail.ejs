@@ -1,4 +1,11 @@
 <%- include('partials/header') %>
+<style>
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+  }
+</style>
 
 <div class="container py-4">
   <div class="row justify-content-center">
@@ -84,6 +91,12 @@
               setInterval(updateCountdown, 1000);
             </script>
           <% } %>
+
+          <div class="d-grid gap-2 mb-4">
+            <a href="/sorteos/<%= raffle._id %>/live" class="btn btn-danger btn-lg rounded-pill fw-bold" style="animation: pulse 2s infinite;">
+              <i class="bi bi-broadcast me-1"></i> VER TRANSMISIÓN EN VIVO
+            </a>
+          </div>
 
           <% if (raffle.status === 'active') { %>
             <!-- SELECTOR DE CANTIDAD -->

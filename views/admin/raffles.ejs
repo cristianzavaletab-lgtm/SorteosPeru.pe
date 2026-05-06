@@ -45,6 +45,13 @@
               <div class="form-text text-muted">El sorteo se cierra 1 minuto antes de esta hora. Ya no se podrán comprar tickets.</div>
             </div>
 
+            <!-- EN VIVO STREAM URL -->
+            <div class="mb-3">
+              <label class="form-label small fw-bold">🔴 Link de Transmisión en Vivo (Opcional)</label>
+              <input type="url" class="form-control" name="streamUrl" value="<%= editRaffle && editRaffle.streamUrl ? editRaffle.streamUrl : '' %>" placeholder="https://www.youtube.com/watch?v=...">
+              <div class="form-text text-muted">Link de YouTube/Twitch/Facebook. Se mostrará a los usuarios.</div>
+            </div>
+
             <!-- IMAGEN PROMOCIONAL -->
             <div class="mb-3">
               <label class="form-label small fw-bold">🖼️ Imagen Promocional (opcional)</label>

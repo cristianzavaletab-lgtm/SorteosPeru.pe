@@ -83,11 +83,11 @@
   <%
     const activeTickets = tickets.filter(t => t.raffleId && t.raffleId.status === 'active');
     const completedTickets = tickets.filter(t => t.raffleId && t.raffleId.status === 'completed');
-    const myWinIds = wins ? wins.map(w => w.raffleId ? w.raffleId._id.toString() : '') : [];
+    const myWinTicketIds = wins ? wins.map(w => w.ticketId ? w.ticketId.toString() : '') : [];
     const pendingPayments = payments.filter(p => p.status === 'pending');
     const rejectedPayments = payments.filter(p => p.status === 'rejected');
-    const wonTickets = completedTickets.filter(t => myWinIds.includes(t.raffleId._id.toString()));
-    const lostTickets = completedTickets.filter(t => !myWinIds.includes(t.raffleId._id.toString()));
+    const wonTickets = completedTickets.filter(t => myWinTicketIds.includes(t._id.toString()));
+    const lostTickets = completedTickets.filter(t => !myWinTicketIds.includes(t._id.toString()));
   %>
 
   <!-- BANNER GANADOR -->
@@ -142,9 +142,14 @@
                     <%= nextRaffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) %>
                   </p>
                 <% } %>
-                <a href="/sorteos/<%= nextRaffle._id %>" class="btn btn-primary fw-bold">
-                  <i class="bi bi-ticket-perforated me-1"></i> ¡Participar Ahora!
-                </a>
+                <div class="d-flex gap-2 flex-wrap">
+                  <a href="/sorteos/<%= nextRaffle._id %>" class="btn btn-primary fw-bold">
+                    <i class="bi bi-ticket-perforated me-1"></i> Participar
+                  </a>
+                  <a href="/sorteos/<%= nextRaffle._id %>/live" class="btn btn-danger fw-bold" style="animation: pulse 2s infinite;">
+                    <i class="bi bi-broadcast me-1"></i> VER EN VIVO
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -253,7 +258,7 @@
                         <h6 class="fw-bold mb-0"><%= ticket.raffleId.title %></h6>
                         <p class="text-muted small mb-0">Ticket: <%= ticket.ticketNumber %></p>
                       </div>
-                      <span class="badge bg-secondary">Finalizado</span>
+                      <span class="badge bg-secondary">No ganador</span>
                     </div>
                   </div>
                 </div>
@@ -335,7 +340,7 @@
       </div>
 
       <!-- CTA -->
-      <div class="card border-0 shadow-sm ticket-card overflow-hidden">
+      <div class="card border-0 shadow-sm ticket-card overflow-hidden mb-4">
         <div class="card-body p-4 text-center" style="background: linear-gradient(135deg, #faf5ff, #fdf2f8);">
           <div style="font-size: 2.5rem;">🍀</div>
           <h6 class="fw-bold mt-2">¡No te quedes con las ganas!</h6>
@@ -343,6 +348,31 @@
           <a href="/sorteos" class="btn btn-outline-primary btn-sm fw-bold rounded-pill px-4">Ver Sorteos Activos</a>
         </div>
       </div>
+
+      <!-- ÚLTIMOS GANADORES GLOBALES -->
+      <% if (recentWinners && recentWinners.length > 0) { %>
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+            <h6 class="fw-bold mb-0"><i class="bi bi-stars text-warning me-1"></i> Últimos Ganadores</h6>
+          </div>
+          <div class="card-body">
+            <% recentWinners.forEach(winner => { %>
+              <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; font-weight: bold; font-size: 1.2rem;">
+                  <%= winner.userId ? winner.userId.name.charAt(0).toUpperCase() : '?' %>
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                  <h6 class="fw-bold mb-0 text-truncate"><%= winner.userId ? winner.userId.name : 'Usuario' %></h6>
+                  <p class="text-success small fw-bold mb-0">Ganó S/<%= winner.prizeValue %></p>
+                  <p class="small text-muted mb-0 d-flex align-items-center gap-1">
+                    Ticket: <span class="fw-bold font-monospace" style="filter: blur(4px); user-select: none; opacity: 0.8;" title="Oculto por privacidad"><%= winner.ticketId ? winner.ticketId.ticketNumber : 'GC-XXXXXX' %></span>
+                  </p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
     </div>
   </div>
 </div>

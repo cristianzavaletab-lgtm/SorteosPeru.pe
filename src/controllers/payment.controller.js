@@ -52,6 +52,9 @@ exports.submitPayment = async (req, res) => {
       ticketQty: parseInt(ticketQty) || 1
     });
 
+    const io = req.app.get('io');
+    io.emit('admin_update', { message: 'Nuevo pago recibido' });
+
     res.redirect('/dashboard');
   } catch (error) {
     console.error(error);

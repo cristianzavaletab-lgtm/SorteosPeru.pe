@@ -1,10 +1,21 @@
 <%- include('../partials/header') %>
 
 <div class="container py-4">
-  <div class="row mb-4 align-items-center">
-    <div class="col">
-      <h2 class="fw-bold mb-0">Panel de Administración</h2>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Panel de Administración</h2>
+    <form action="/admin" method="GET" class="d-flex align-items-center">
+      <label class="me-2 text-muted small fw-bold text-nowrap">Filtrar métricas por:</label>
+      <select name="raffleId" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 200px;">
+        <option value="">Todos los sorteos</option>
+        <% if (locals.allRaffles && locals.allRaffles.length > 0) { %>
+          <% allRaffles.forEach(r => { %>
+            <option value="<%= r._id %>" <%= locals.selectedRaffleId == r._id ? 'selected' : '' %>>
+              <%= r.title %>
+            </option>
+          <% }) %>
+        <% } %>
+      </select>
+    </form>
   </div>
 
   <div class="row g-4 mb-5">
@@ -45,6 +56,47 @@
               <h3 class="display-6 fw-bold mb-0"><%= ticketsGifted %></h3>
               <span class="small text-white-50">Regalados</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tickets por Sorteo Activo -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white pt-4 pb-3 border-0">
+          <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Rendimiento por Sorteo Activo</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-dark">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Sorteo</th>
+                  <th class="text-center">Tickets Vendidos</th>
+                  <th class="text-center">Tickets Regalados</th>
+                  <th class="text-end pe-4">Ingresos Brutos (S/)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (typeof raffleStats !== 'undefined' && raffleStats.length > 0) { %>
+                  <% raffleStats.forEach(stat => { %>
+                    <tr>
+                      <td class="ps-4 fw-semibold"><%= stat.title %></td>
+                      <td class="text-center"><span class="badge bg-primary fs-6 px-3"><%= stat.sold %></span></td>
+                      <td class="text-center"><span class="badge bg-secondary fs-6 px-3"><%= stat.gifted %></span></td>
+                      <td class="text-end pe-4 text-success fw-bold">S/<%= stat.revenue.toFixed(2) %></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">No hay sorteos activos en este momento.</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

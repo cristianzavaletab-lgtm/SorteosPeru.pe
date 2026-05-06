@@ -5,7 +5,7 @@ const Winner = require('../models/Winner');
 exports.getHome = async (req, res) => {
   try {
     const activeRaffles = await Raffle.find({ status: 'active' }).sort({ createdAt: -1 });
-    const winners = await Winner.find({}).populate('userId').populate('raffleId').sort({ createdAt: -1 }).limit(5);
+    const winners = await Winner.find({}).populate('userId').populate('raffleId').populate('ticketId').sort({ createdAt: -1 }).limit(5);
     res.render('home', { activeRaffles, winners });
   } catch (error) {
     res.status(500).send('Error en el servidor');
@@ -28,5 +28,19 @@ exports.getRaffleDetail = async (req, res) => {
     res.render('raffle-detail', { raffle, ticketCount });
   } catch (error) {
     res.status(500).send('Error en el servidor');
+  }
+};
+
+exports.getRaffleLive = async (req, res) => {
+  try {
+    const raffle = await Raffle.findById(req.params.id);
+    if (!raffle) return res.status(404).send('Sorteo no encontrado');
+    
+    // Obtener algunos tickets para mostrar en la ruleta (ruido)
+    const tickets = await Ticket.find({ raffleId: raffle._id, status: 'valid' }).populate('userId').limit(150);
+    
+    res.render('raffle-live', { raffle, tickets });
+  } catch (error) {
+    res.status(500).send('Error al cargar la transmisión en vivo');
   }
 };
