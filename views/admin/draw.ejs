@@ -203,20 +203,47 @@
   let isSpinning = false;
   let winnerData = null;
 
-  // Generar tira de participantes (aleatoria para ruido)
+  // Generar tira con DISTRIBUCIÓN EQUITATIVA de nombres (visual justo)
   function buildStrip(winner = null) {
     slotStrip.innerHTML = '';
     const stripItems = [];
     
-    // Si hay pocos usuarios, los repetimos. Si hay muchos, tomamos una muestra.
+    // Extraer participantes ÚNICOS (por nombre)
+    const uniqueMap = {};
+    ticketsData.forEach(t => {
+      if (!uniqueMap[t.name]) uniqueMap[t.name] = t;
+    });
+    const uniqueParticipants = Object.values(uniqueMap);
+    
+    // Llenar la tira alternando entre todos los participantes (distribución justa visual)
     for (let i = 0; i < visibleItems; i++) {
-      const randomIdx = Math.floor(Math.random() * ticketsData.length);
-      stripItems.push(ticketsData[randomIdx]);
+      // Rotar entre participantes + un poco de aleatoriedad en el orden
+      const shuffled = [...uniqueParticipants].sort(() => Math.random() - 0.5);
+      stripItems.push(shuffled[i % shuffled.length]);
     }
 
-    // Si tenemos ganador, lo ponemos cerca del final para el aterrizaje
+    // Mezclar la tira completa para que no se vea un patrón repetitivo
+    for (let i = stripItems.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [stripItems[i], stripItems[j]] = [stripItems[j], stripItems[i]];
+    }
+
+    // Evitar nombres consecutivos iguales
+    for (let i = 1; i < stripItems.length; i++) {
+      if (stripItems[i].name === stripItems[i-1].name) {
+        // Buscar el siguiente diferente y swap
+        for (let j = i + 1; j < stripItems.length; j++) {
+          if (stripItems[j].name !== stripItems[i-1].name) {
+            [stripItems[i], stripItems[j]] = [stripItems[j], stripItems[i]];
+            break;
+          }
+        }
+      }
+    }
+
+    // Si tenemos ganador, lo ponemos en la posición de frenado
     if (winner) {
-      const landingIndex = visibleItems - 10; // Posición de frenado
+      const landingIndex = visibleItems - 10;
       stripItems[landingIndex] = { name: winner.name, number: winner.ticketNumber };
       winner.landingIndex = landingIndex;
     }

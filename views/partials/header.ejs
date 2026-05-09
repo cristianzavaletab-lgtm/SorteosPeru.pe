@@ -28,29 +28,60 @@
   </script>
 </head>
 <body>
+<!-- Banner Top Promocional -->
+<div class="bg-primary text-white text-center py-2" style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); font-size: 0.9rem;">
+  <div class="container fw-bold">
+    <i class="bi bi-gift-fill text-warning me-1"></i> 
+    ¿Tienes un código de un Negocio Aliado? 
+    <a href="/canjear" class="text-white text-decoration-underline ms-1">Canjéalo aquí y obtén tu ticket gratis</a>
+  </div>
+</div>
 
 <nav class="navbar navbar-expand-lg sticky-top">
   <div class="container">
     <a class="navbar-brand brand-text" href="/">
       <i class="bi bi-graph-up-arrow"></i> SorteosPeru<span style="color:var(--accent-color)">.</span>pe
     </a>
-    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <div class="d-flex align-items-center ms-auto d-lg-none me-2">
+      <!-- Theme Toggle (Mobile) -->
+      <button id="themeToggleMobile" class="btn btn-link nav-link px-2 text-decoration-none" onclick="toggleTheme()">
+        <i class="bi bi-moon-stars-fill fs-4" id="themeIconMobile"></i>
+      </button>
+    </div>
+
+    <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <i class="bi bi-list fs-1" style="color: var(--text-light);"></i>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link fw-semibold" href="/sorteos">Sorteos Activos</a>
+          <a class="nav-link fw-semibold" href="/sorteos"><i class="bi bi-trophy-fill me-2 text-primary"></i>Sorteos Activos</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link fw-semibold text-warning" href="/negocios"><i class="bi bi-star-fill me-2"></i>Negocios Aliados</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-semibold" href="/canjear"><i class="bi bi-ticket-perforated-fill me-2 text-info"></i>Canjear Código</a>
+        </li>
+        <% if (user) { %>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-success" href="/recompensas"><i class="bi bi-gift-fill small me-1"></i>Recompensas</a>
+        </li>
+        <% } %>
       </ul>
       <ul class="navbar-nav align-items-center">
-        <!-- Theme Toggle -->
-        <li class="nav-item me-3">
-          <button id="themeToggle" class="btn btn-link nav-link px-0 text-decoration-none">
-            <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+        <!-- Theme Toggle (Desktop) -->
+        <li class="nav-item me-3 d-none d-lg-block">
+          <button id="themeToggleDesktop" class="btn btn-link nav-link px-0 text-decoration-none" onclick="toggleTheme()">
+            <i class="bi bi-moon-stars-fill fs-5" id="themeIconDesktop"></i>
           </button>
         </li>
         <% if (user) { %>
+          <li class="nav-item d-flex align-items-center me-2">
+            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm fw-bold">
+              <i class="bi bi-coin me-1"></i> <%= user.credits || 0 %> SP
+            </span>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
               <i class="bi bi-person-circle" style="color: var(--accent-color);"></i> Mi Cuenta
@@ -79,21 +110,19 @@
 </nav>
 
 <script>
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
+  const themeIconMobile = document.getElementById('themeIconMobile');
+  const themeIconDesktop = document.getElementById('themeIconDesktop');
   
   function updateIcon(theme) {
-    if (theme === 'light') {
-      themeIcon.className = 'bi bi-sun-fill text-warning';
-    } else {
-      themeIcon.className = 'bi bi-moon-stars-fill';
-    }
+    const iconClass = theme === 'light' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars-fill';
+    if (themeIconMobile) themeIconMobile.className = iconClass + ' fs-4';
+    if (themeIconDesktop) themeIconDesktop.className = iconClass + ' fs-5';
   }
 
   // Inicializar icono
   updateIcon(document.documentElement.getAttribute('data-theme') || 'dark');
 
-  themeToggle.addEventListener('click', () => {
+  function toggleTheme() {
     let currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
@@ -105,7 +134,7 @@
     
     localStorage.setItem('theme', newTheme);
     updateIcon(newTheme);
-  });
+  }
 </script>
 
 <!-- Contenido principal -->

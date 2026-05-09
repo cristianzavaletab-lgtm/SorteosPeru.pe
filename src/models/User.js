@@ -7,7 +7,16 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  status: { type: String, enum: ['active', 'blocked'], default: 'active' }
+  status: { type: String, enum: ['active', 'blocked'], default: 'active' },
+  // Gamification Fields
+  credits: { type: Number, default: 0 },
+  lastLoginDate: { type: Date, default: null },
+  streakDays: { type: Number, default: 0 },
+  lastFreeSpin: { type: Date, default: null },
+  consecutiveExtraSpins: { type: Number, default: 0 },
+  lastMysteryChest: { type: Date, default: null },
+  mysteryBoxOpens: { type: Number, default: 0 },
+  totalGamesPlayed: { type: Number, default: 0 }
 }, { timestamps: true });
 
 userSchema.pre('save', async function() {

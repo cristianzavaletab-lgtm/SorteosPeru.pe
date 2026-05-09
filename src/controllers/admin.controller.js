@@ -72,7 +72,7 @@ exports.approvePayment = async (req, res) => {
     payment.approvedAt = Date.now();
     await payment.save();
 
-    // Generar N tickets según la cantidad comprada
+    // Generar N tickets según la cantidad comprada y dar créditos (20 por ticket)
     const qty = payment.ticketQty || 1;
     const ticketNumbers = [];
     for (let i = 0; i < qty; i++) {
@@ -84,6 +84,17 @@ exports.approvePayment = async (req, res) => {
         ticketNumber
       });
       ticketNumbers.push(ticketNumber);
+    }
+
+    // Premiar con 10-20 créditos SP SOLO si compró más de 2 tickets
+    if (qty > 2) {
+      const spPerTicket = Math.floor(Math.random() * 11) + 10; // 10 a 20
+      const creditsAwarded = qty * spPerTicket;
+      const user = await User.findById(payment.userId._id);
+      if (user) {
+        user.credits = (user.credits || 0) + creditsAwarded;
+        await user.save();
+      }
     }
 
     const io = req.app.get('io');
@@ -355,6 +366,14 @@ exports.giftTickets = async (req, res) => {
         status: 'valid'
       });
       ticketNumbers.push(ticketNumber);
+    }
+
+    // Premiar con 20 créditos SP por cada ticket regalado
+    const creditsAwarded = parseInt(qty) * 20;
+    const user = await User.findById(userId);
+    if (user) {
+      user.credits = (user.credits || 0) + creditsAwarded;
+      await user.save();
     }
 
     const io = req.app.get('io');

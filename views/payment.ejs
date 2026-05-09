@@ -25,7 +25,7 @@
             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
             
             <div class="position-relative z-1">
-              <span class="badge bg-white text-primary rounded-pill px-3 py-1 mb-3 fw-bold tracking-wider text-uppercase">Resumen de Compra</span>
+              <span class="badge bg-secondary text-primary rounded-pill px-3 py-1 mb-3 fw-bold tracking-wider text-uppercase" style="background: rgba(255,255,255,0.1) !important; color: #fff !important;">Resumen de Compra</span>
               <h3 class="fw-bold mb-2 text-white"><%= raffle.title %></h3>
               <p class="fs-5 mb-3 text-white-50"><%= qty %> ticket<%= qty > 1 ? 's' : '' %></p>
               <div class="d-inline-block bg-white bg-opacity-25 rounded-pill px-4 py-2 backdrop-blur">
@@ -39,17 +39,17 @@
             
             <div class="row g-4 mb-5">
               <div class="col-md-6">
-                <div class="bg-light p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
+                <div class="card p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
                   <div class="badge bg-primary px-3 py-2 mb-3 rounded-pill fw-bold" style="background: linear-gradient(135deg, #742284, #00d3a5) !important;">
                     <i class="bi bi-qr-code-scan me-1"></i> YAPE / PLIN
                   </div>
-                  <img src="/images/qr-pago.png" class="img-fluid rounded-3 shadow mb-3" style="max-height: 180px; border: 4px solid white;">
+                  <img src="/images/qr-pago.png" class="img-fluid rounded-3 shadow mb-3" style="max-height: 180px; border: 4px solid var(--card-border);">
                   <p class="text-muted small mb-0 fw-medium">Escanea desde tu app bancaria</p>
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="bg-light p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
-                  <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                <div class="card p-4 rounded-4 border h-100 d-flex flex-column align-items-center justify-content-center text-center hover-lift transition-all">
+                  <div class="rounded-circle card shadow-sm d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                     <i class="bi bi-phone text-primary fs-3"></i>
                   </div>
                   <p class="text-muted small mb-1 text-uppercase tracking-wider">Número Oficial</p>
@@ -103,9 +103,9 @@
               <div class="row justify-content-center mb-5">
                 <div class="col-md-8">
                   <label class="form-label text-muted small fw-bold text-uppercase tracking-wider ms-2">Comprobante de Pago</label>
-                  <div id="uploadZone" class="border border-2 border-dashed rounded-4 p-5 text-center bg-light position-relative transition-all hover-lift" style="cursor: pointer; border-color: var(--primary-color) !important;">
+                  <div id="uploadZone" class="border border-2 border-dashed rounded-4 p-5 text-center bg-transparent position-relative transition-all hover-lift" style="cursor: pointer; border-color: var(--primary-color) !important;">
                     <i class="bi bi-cloud-arrow-up text-primary mb-3 d-block" id="uploadIcon" style="font-size: 3rem;"></i>
-                    <h5 class="fw-bold text-light mb-2" id="uploadText">Sube tu captura aquí</h5>
+                    <h5 class="fw-bold mb-2" id="uploadText">Sube tu captura aquí</h5>
                     <p class="text-muted small mb-0" id="uploadHint">Formatos soportados: JPG, PNG (Max 5MB)</p>
                     <input type="file" class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;" name="receipt" id="receiptInput" required accept="image/png, image/jpeg">
                   </div>

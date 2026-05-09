@@ -1,25 +1,101 @@
+/* =============================================
+   SorteosPeru.pe — Paleta Premium Premios/Dorado
+   ============================================= */
+
 :root {
-  --primary-color: #6366f1; /* Indigo */
-  --primary-hover: #4f46e5;
-  --secondary-color: #ec4899; /* Pink */
-  --accent-color: #fbbf24; /* Amber */
-  --bg-color: #0f172a; /* Slate 900 */
-  --bg-darker: #020617; /* Slate 950 */
-  --card-bg: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
-  --card-border: rgba(255, 255, 255, 0.08);
-  --text-light: #f8fafc; /* Slate 50 */
-  --text-muted: #94a3b8; /* Slate 400 */
-  --glass-bg: rgba(15, 23, 42, 0.75);
+  /* Primary: Deep Purple */
+  --primary-color: #5B21B6;
+  --primary-hover: #4c1d95;
+  --primary-light: rgba(91, 33, 182, 0.15);
+
+  /* Secondary: Magenta/Fuchsia */
+  --secondary-color: #D946EF;
+  --secondary-light: rgba(217, 70, 239, 0.15);
+
+  /* Accent: Gold */
+  --accent-color: #F5C542;
+  --accent-light: #FFD77A;
+
+  /* Backgrounds — Dark Purple */
+  --bg-color: #160d25;
+  --bg-darker: #120720;
+  --bg-elevated: #1e1235;
+
+  /* Cards */
+  --card-bg: rgba(42, 30, 63, 0.75);
+  --card-bg-solid: #2A1E3F;
+  --card-border: rgba(245, 197, 66, 0.12);
+
+  /* Text */
+  --text-light: #FFF7E6;
+  --text-muted: #a89cc2;
+  --text-gold: #F5C542;
+
+  /* Glass */
+  --glass-bg: rgba(18, 7, 32, 0.82);
+
+  /* Table */
+  --table-header-bg: rgba(91, 33, 182, 0.08);
+  --table-hover-bg: rgba(245, 197, 66, 0.04);
+
+  /* Input */
+  --input-bg: rgba(42, 30, 63, 0.6);
+
+  /* Borders */
+  --border-color: rgba(245, 197, 66, 0.1);
+
+  /* Glow effects */
+  --glow-primary: rgba(91, 33, 182, 0.4);
+  --glow-gold: rgba(245, 197, 66, 0.3);
+  --glow-secondary: rgba(217, 70, 239, 0.3);
 }
 
+/* =============================================
+   Light Theme — Lavender Premium
+   ============================================= */
 [data-theme="light"] {
-  --bg-color: #f8fafc;
-  --bg-darker: #f1f5f9;
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(0, 0, 0, 0.1);
-  --text-light: #0f172a;
-  --text-muted: #64748b;
-  --glass-bg: rgba(255, 255, 255, 0.85);
+  --bg-color: #F3ECFF;
+  --bg-darker: #ede4fb;
+  --bg-elevated: #ffffff;
+
+  --card-bg: rgba(255, 255, 255, 0.92);
+  --card-bg-solid: #ffffff;
+  --card-border: rgba(91, 33, 182, 0.12);
+
+  --text-light: #1a0e2e;
+  --text-muted: #6b5b8a;
+  --text-gold: #b8860b;
+
+  --glass-bg: rgba(243, 236, 255, 0.88);
+
+  --table-header-bg: rgba(91, 33, 182, 0.05);
+  --table-hover-bg: rgba(91, 33, 182, 0.04);
+
+  --input-bg: #ffffff;
+  --border-color: rgba(91, 33, 182, 0.1);
+
+  --glow-primary: rgba(91, 33, 182, 0.15);
+  --glow-gold: rgba(245, 197, 66, 0.15);
+  --glow-secondary: rgba(217, 70, 239, 0.1);
+}
+
+/* =============================================
+   Global Transitions (Smooth Theme Switch)
+   ============================================= */
+body,
+body *,
+body *::before,
+body *::after {
+  transition-property: background-color, background, color, border-color, box-shadow, fill, stroke, opacity;
+  transition-duration: 0.45s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Exclude animations/transforms from theme transition */
+a, .btn, .btn-primary, .btn-outline-primary,
+.card, .nav-link, .how-it-works-icon,
+.form-control, .form-select {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -27,11 +103,11 @@ body {
   background-color: var(--bg-darker);
   color: var(--text-light);
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+    radial-gradient(circle at 0% 0%, rgba(91, 33, 182, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(217, 70, 239, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(245, 197, 66, 0.05) 0%, transparent 60%);
   background-attachment: fixed;
   min-height: 100vh;
-  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Typography */
@@ -40,18 +116,20 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Navbar */
+/* =============================================
+   Navbar
+   ============================================= */
 .navbar {
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--card-border);
   padding: 1rem 0;
 }
 
 .brand-text {
   font-weight: 800;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -62,34 +140,44 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link {
   color: var(--text-light) !important;
   font-weight: 500;
-  transition: all 0.3s ease;
+  padding: 0.8rem 1rem !important;
+  border-radius: 0.5rem;
 }
 
 .nav-link:hover {
-  color: var(--secondary-color) !important;
-  transform: translateY(-1px);
+  color: var(--accent-color) !important;
+  background: var(--primary-light);
+  transform: translateX(5px);
+}
+
+@media (min-width: 992px) {
+  .nav-link:hover {
+    transform: translateY(-1px);
+    background: transparent;
+  }
 }
 
 .dropdown-menu {
   background: var(--bg-color);
   border: 1px solid var(--card-border);
   border-radius: 1rem;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(18, 7, 32, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .dropdown-item {
   color: var(--text-light);
-  transition: all 0.2s;
 }
 
 .dropdown-item:hover {
-  background: rgba(128, 128, 128, 0.1);
-  color: var(--primary-color);
+  background: var(--primary-light);
+  color: var(--accent-color);
 }
 
-/* Hero Section */
+/* =============================================
+   Hero Section
+   ============================================= */
 .hero-section {
   padding: 7rem 0 5rem;
   position: relative;
@@ -99,7 +187,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-title {
   font-size: 4rem;
-  background: linear-gradient(to right, #fff, var(--text-muted));
+  background: linear-gradient(to right, var(--text-light), var(--text-muted));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -115,26 +203,35 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeUp 1s ease-out;
 }
 
-/* Cards (Glassmorphism) */
+/* =============================================
+   Cards (Glassmorphism Premium)
+   ============================================= */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 1.5rem;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(245, 197, 66, 0.05);
   color: var(--text-light);
   overflow: hidden;
 }
 
 .card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 
+    0 20px 40px rgba(18, 7, 32, 0.5),
+    0 0 30px var(--glow-primary),
+    inset 0 1px 0 rgba(245, 197, 66, 0.1);
+  border-color: rgba(245, 197, 66, 0.3);
 }
 
-/* Buttons */
+/* =============================================
+   Buttons — Premium Gold + Purple
+   ============================================= */
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   border: none;
@@ -142,8 +239,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.8rem 2.5rem;
   font-weight: 600;
   color: white;
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px var(--glow-primary);
   position: relative;
   overflow: hidden;
 }
@@ -166,80 +262,158 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 25px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 15px 30px var(--glow-secondary);
+  background: linear-gradient(135deg, var(--primary-hover), var(--secondary-color));
 }
 
 .btn-outline-primary {
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--accent-color);
   color: var(--text-light);
   border-radius: 1rem;
   padding: 0.7rem 2rem;
   font-weight: 600;
-  background: rgba(99, 102, 241, 0.1);
-  transition: all 0.3s ease;
+  background: rgba(245, 197, 66, 0.08);
 }
 
 .btn-outline-primary:hover {
-  background: var(--primary-color);
-  color: white;
+  background: var(--accent-color);
+  color: #120720;
+  border-color: var(--accent-color);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 24px var(--glow-gold);
 }
 
-/* How It Works */
+/* =============================================
+   How It Works — Gold Icons
+   ============================================= */
 .how-it-works-icon {
   width: 70px;
   height: 70px;
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
-  border: 1px solid var(--card-border);
+  background: linear-gradient(135deg, rgba(245, 197, 66, 0.12), rgba(217, 70, 239, 0.06));
+  border: 1px solid rgba(245, 197, 66, 0.15);
   font-size: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
   color: var(--accent-color);
-  transition: transform 0.3s ease;
 }
 
 .how-it-works-step:hover .how-it-works-icon {
   transform: scale(1.1) rotate(5deg);
   border-color: var(--accent-color);
+  box-shadow: 0 0 20px var(--glow-gold);
 }
 
-/* Animations */
+/* =============================================
+   Table Styles
+   ============================================= */
+.table {
+  color: var(--text-light) !important;
+  border-color: var(--card-border) !important;
+}
+
+.table thead, .table-light {
+  background-color: var(--table-header-bg) !important;
+  color: var(--text-light) !important;
+}
+
+.table th {
+  border-bottom: 2px solid var(--card-border) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--table-hover-bg) !important;
+  color: var(--text-light) !important;
+}
+
+.table td {
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* =============================================
+   Modal Styles
+   ============================================= */
+.modal-content {
+  background: var(--bg-color);
+  border: 1px solid var(--card-border);
+  color: var(--text-light);
+  border-radius: 1.5rem;
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 25px 60px rgba(18, 7, 32, 0.7);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--card-border);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--card-border);
+}
+
+/* =============================================
+   Animations
+   ============================================= */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Utilities */
+@keyframes shimmerGold {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* =============================================
+   Utilities
+   ============================================= */
 .text-muted {
   color: var(--text-muted) !important;
 }
 
 .bg-light {
-  background-color: rgba(255,255,255,0.05) !important;
+  background-color: var(--table-header-bg) !important;
+}
+
+.bg-white {
+  background-color: var(--card-bg) !important;
 }
 
 .border {
   border-color: var(--card-border) !important;
 }
 
-/* Form Elements */
+.text-dark {
+  color: var(--text-light) !important;
+}
+
+/* Gold accent text utility */
+.text-accent {
+  color: var(--accent-color) !important;
+}
+
+/* =============================================
+   Form Elements
+   ============================================= */
 .form-control, .form-select {
-  background-color: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--card-border);
-  color: var(--text-light);
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-light) !important;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
 }
 
 .form-control:focus, .form-select:focus {
-  background-color: rgba(15, 23, 42, 0.8);
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-  color: white;
+  background-color: var(--bg-color) !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 4px rgba(245, 197, 66, 0.15);
 }
 
 .form-label {
@@ -247,16 +421,516 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
-/* Badge */
+/* =============================================
+   Badge
+   ============================================= */
 .badge {
   padding: 0.5em 1em;
   border-radius: 2rem;
   font-weight: 600;
 }
 
+/* =============================================
+   Scrollbar — Premium Purple
+   ============================================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+
+/* =============================================
+   Selection
+   ============================================= */
+::selection {
+  background: rgba(245, 197, 66, 0.3);
+  color: var(--text-light);
+}
+
+/* =============================================
+   Footer — Premium Dark
+   ============================================= */
+footer, footer.bg-dark {
+  background: var(--bg-darker) !important;
+  border-top: 1px solid var(--card-border);
+}
+
+footer h5, footer .text-white {
+  color: var(--accent-color) !important;
+}
+
+footer .text-secondary {
+  color: var(--text-muted) !important;
+}
+
+footer .text-primary {
+  color: var(--accent-color) !important;
+}
+
+/* =============================================
+   Alerts — Themed
+   ============================================= */
+.alert-danger {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  border-radius: 0.75rem;
+}
+
+[data-theme="light"] .alert-danger {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+}
+
+.alert-success {
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #86efac !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+  border-radius: 0.75rem;
+}
+
+[data-theme="light"] .alert-success {
+  background: rgba(34, 197, 94, 0.08) !important;
+  color: #16a34a !important;
+}
+
+/* =============================================
+   Links — Gold Accent
+   ============================================= */
+a {
+  color: var(--accent-color);
+}
+
+a:hover {
+  color: var(--accent-light);
+}
+
+/* =============================================
+   Outline Secondary Button (password toggle etc)
+   ============================================= */
+.btn-outline-secondary {
+  border-color: var(--card-border) !important;
+  color: var(--text-muted) !important;
+  background: var(--input-bg) !important;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--primary-light) !important;
+  color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* =============================================
+   Form Extras
+   ============================================= */
+.form-text {
+  color: var(--text-muted) !important;
+  opacity: 0.7;
+}
+
+.form-check-input {
+  background-color: var(--input-bg);
+  border-color: var(--card-border);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.form-check-label {
+  color: var(--text-muted);
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.5;
+}
+
+/* =============================================
+   Input Group (login/register)
+   ============================================= */
+.input-group .form-control {
+  border-right: none !important;
+}
+
+.input-group .btn {
+  border-top-right-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
+}
+
+/* =============================================
+   bg-dark override
+   ============================================= */
+.bg-dark {
+  background-color: var(--bg-darker) !important;
+}
+
+/* =============================================
+   Toast notifications
+   ============================================= */
+.toast {
+  border-radius: 1rem !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* =============================================
+   Hero Gold Underline Animation
+   ============================================= */
+.hero-section::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+  border-radius: 2px;
+  animation: shimmerGold 3s ease-in-out infinite;
+  background-size: 200% auto;
+}
+
+/* =============================================
+   Animated Gold Border Glow (for featured cards)
+   ============================================= */
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(245, 197, 66, 0.15); }
+  50% { border-color: rgba(245, 197, 66, 0.4); }
+}
+
+.next-raffle-card,
+.card[style*="border-left"] {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* =============================================
+   Stat Cards (Dashboard sidebar)
+   ============================================= */
+.stat-card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+
+.stat-card .text-primary {
+  color: var(--primary-color) !important;
+}
+
+.stat-card .text-warning {
+  color: var(--accent-color) !important;
+}
+
+.stat-card .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* =============================================
+   Gradient Card (Dashboard header)
+   ============================================= */
+.gradient-card {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+/* =============================================
+   Tab Custom (Dashboard)
+   ============================================= */
+.tab-custom .nav-link {
+  color: var(--text-muted) !important;
+}
+
+.tab-custom .nav-link.active {
+  color: var(--accent-color) !important;
+  border-bottom-color: var(--accent-color) !important;
+}
+
+.tab-custom .nav-link:hover {
+  color: var(--accent-color) !important;
+}
+
+/* =============================================
+   Ticket Number Style
+   ============================================= */
+.ticket-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--accent-color);
+  font-size: 1.3rem;
+}
+
+/* =============================================
+   CTA Card (Dashboard sidebar)
+   ============================================= */
+.card-body[style*="faf5ff"],
+.card-body[style*="fce7f3"] {
+  background: var(--card-bg) !important;
+}
+
+/* =============================================
+   Light Mode Background Gradients
+   ============================================= */
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(91, 33, 182, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(217, 70, 239, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(245, 197, 66, 0.03) 0%, transparent 60%);
+}
+/* =============================================
+   LIGHT MODE — Comprehensive Fixes
+   ============================================= */
+
+/* Hero Title: dark text in light mode */
+[data-theme="light"] .hero-title {
+  background: linear-gradient(to right, #1a0e2e, #6b5b8a) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Hero subtitle */
+[data-theme="light"] .hero-subtitle {
+  color: #6b5b8a !important;
+}
+
+/* "Saber Más" outline button — fix invisible text */
+[data-theme="light"] .btn-outline-primary {
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+  background: rgba(91, 33, 182, 0.06) !important;
+}
+[data-theme="light"] .btn-outline-primary:hover {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* Navbar text */
+[data-theme="light"] .nav-link {
+  color: #1a0e2e !important;
+}
+[data-theme="light"] .nav-link:hover {
+  color: var(--primary-color) !important;
+}
+[data-theme="light"] .nav-link.fw-semibold .text-primary {
+  color: var(--primary-color) !important;
+}
+
+/* Badge pills in navbar */
+[data-theme="light"] .badge.bg-warning {
+  background: linear-gradient(135deg, #F5C542, #d97706) !important;
+  color: #120720 !important;
+}
+
+/* Dropdown */
+[data-theme="light"] .dropdown-item {
+  color: #1a0e2e;
+}
+[data-theme="light"] .dropdown-item:hover {
+  background: rgba(91, 33, 182, 0.06);
+  color: var(--primary-color);
+}
+
+/* Hero badge (La plataforma #1) */
+[data-theme="light"] .hero-section .badge {
+  background: rgba(91, 33, 182, 0.08) !important;
+  color: var(--primary-color) !important;
+  border-color: rgba(91, 33, 182, 0.2) !important;
+}
+
+/* "Proceso Simple" accent label */
+[data-theme="light"] .text-uppercase[style*="accent-color"] {
+  color: #b8860b !important;
+}
+
+/* How it works icons */
+[data-theme="light"] .how-it-works-icon {
+  background: linear-gradient(135deg, rgba(91, 33, 182, 0.08), rgba(245, 197, 66, 0.08)) !important;
+  border-color: rgba(91, 33, 182, 0.12) !important;
+  color: var(--primary-color) !important;
+}
+[data-theme="light"] .how-it-works-step:hover .how-it-works-icon {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 20px rgba(91, 33, 182, 0.15) !important;
+}
+
+/* How it works text */
+[data-theme="light"] .how-it-works-step h5 {
+  color: #1a0e2e !important;
+}
+[data-theme="light"] .how-it-works-step p {
+  color: #6b5b8a !important;
+}
+
+/* Cards in light mode */
+[data-theme="light"] .card {
+  box-shadow: 0 4px 20px rgba(91, 33, 182, 0.06), 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .card:hover {
+  box-shadow: 0 12px 35px rgba(91, 33, 182, 0.1);
+  border-color: rgba(91, 33, 182, 0.2);
+}
+[data-theme="light"] .card-title {
+  color: #1a0e2e !important;
+}
+[data-theme="light"] .card-body h3,
+[data-theme="light"] .card-body h4,
+[data-theme="light"] .card-body h5 {
+  color: #1a0e2e;
+}
+
+/* Raffle card gradient placeholder */
+[data-theme="light"] .card-img-top + .position-absolute .badge {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #b8860b !important;
+}
+
+/* "Valor del Premio" section */
+[data-theme="light"] .bg-light {
+  background-color: rgba(91, 33, 182, 0.04) !important;
+}
+[data-theme="light"] .text-success {
+  color: #059669 !important;
+}
+
+/* Date icon circles */
+[data-theme="light"] .rounded-circle[style*="rgba(99, 102, 241"] {
+  background: rgba(91, 33, 182, 0.08) !important;
+}
+
+/* Sorteos Activos Live badge */
+[data-theme="light"] .badge.bg-danger {
+  background: linear-gradient(135deg, #ef4444, #f43f5e) !important;
+  color: #fff !important;
+}
+
+/* "Ver todos" link */
+[data-theme="light"] .hover-lift[style*="accent-color"] {
+  color: #b8860b !important;
+}
+
+/* Ganadores section */
+[data-theme="light"] .card[style*="rgba(255,255,255,0.05)"] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(91, 33, 182, 0.1) !important;
+}
+
+/* Winner avatar circles */
+[data-theme="light"] .rounded-circle[style*="#f59e0b"] {
+  box-shadow: 0 4px 12px rgba(245, 197, 66, 0.3);
+}
+
+/* Footer in light mode */
+[data-theme="light"] footer {
+  background: #1a0e2e !important;
+}
+[data-theme="light"] footer h5,
+[data-theme="light"] footer .text-white {
+  color: var(--accent-color) !important;
+}
+[data-theme="light"] footer .text-secondary {
+  color: #a89cc2 !important;
+}
+
+/* Form labels */
+[data-theme="light"] .form-label {
+  color: #6b5b8a !important;
+}
+
+/* Login/Register card heading */
+[data-theme="light"] h2[style*="secondary-color"] {
+  color: var(--primary-color) !important;
+}
+
+/* Links */
+[data-theme="light"] a[style*="accent-color"] {
+  color: var(--primary-color) !important;
+}
+
+/* btn-outline-secondary (password toggle) */
+[data-theme="light"] .btn-outline-secondary {
+  background: #fff !important;
+  border-color: rgba(91, 33, 182, 0.15) !important;
+  color: #6b5b8a !important;
+}
+
+/* text-light class in light mode */
+[data-theme="light"] .text-light {
+  color: #1a0e2e !important;
+}
+
+/* Hero decorative blobs: subtler in light mode */
+[data-theme="light"] .hero-section .position-absolute .rounded-circle {
+  opacity: 0.08 !important;
+}
+
+/* btn-primary keeps white text */
+[data-theme="light"] .btn-primary {
+  color: #fff !important;
+}
+
+/* Dashboard gradient card keeps white text */
+[data-theme="light"] .gradient-card,
+[data-theme="light"] .gradient-card * {
+  color: #fff !important;
+}
+
+/* Dashboard stats numbers */
+[data-theme="light"] .stat-card h2.text-primary {
+  color: var(--primary-color) !important;
+}
+[data-theme="light"] .stat-card h2.text-warning {
+  color: #b8860b !important;
+}
+[data-theme="light"] .stat-card h2.text-success {
+  color: #059669 !important;
+}
+[data-theme="light"] .stat-card h2.text-danger {
+  color: #dc2626 !important;
+}
+
+/* Dashboard tab active */
+[data-theme="light"] .tab-custom .nav-link {
+  color: #6b5b8a !important;
+}
+[data-theme="light"] .tab-custom .nav-link.active {
+  color: var(--primary-color) !important;
+  border-bottom-color: var(--primary-color) !important;
+}
+
+/* Next raffle card border */
+[data-theme="light"] .next-raffle-card {
+  border-left-color: var(--primary-color) !important;
+}
+
+/* Ticket cards */
+[data-theme="light"] .ticket-card[style*="border-top: 4px solid #22c55e"] {
+  border-top-color: #059669 !important;
+}
+
+/* Ticket number gold */
+[data-theme="light"] .ticket-number {
+  color: #b8860b;
+}
+
+/* =============================================
+   Responsive
+   ============================================= */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.5rem;
   }
-}
 
+  .card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+}

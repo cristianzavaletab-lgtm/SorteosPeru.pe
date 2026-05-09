@@ -2,7 +2,7 @@
 
 <style>
   .gradient-card {
-    background: linear-gradient(135deg, #7e22ce, #db2777);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 1.5rem;
     color: white;
     position: relative;
@@ -35,16 +35,16 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
   }
   .next-raffle-card {
-    border-left: 5px solid #9333ea;
+    border-left: 5px solid var(--primary-color);
     animation: glow-border 2s ease-in-out infinite alternate;
     border-radius: 1rem !important;
   }
   @keyframes glow-border {
-    from { border-left-color: #9333ea; }
-    to { border-left-color: #ec4899; }
+    from { border-left-color: var(--primary-color); }
+    to { border-left-color: var(--secondary-color); }
   }
   .tab-custom .nav-link {
-    color: #6b7280;
+    color: var(--text-muted);
     font-weight: 600;
     border: none;
     border-bottom: 3px solid transparent;
@@ -52,11 +52,11 @@
     padding: 0.75rem 1.25rem;
   }
   .tab-custom .nav-link.active {
-    color: #9333ea;
-    border-bottom-color: #9333ea;
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
     background: none;
   }
-  .tab-custom .nav-link:hover { color: #9333ea; }
+  .tab-custom .nav-link:hover { color: var(--accent-color); }
   .stat-card {
     border-radius: 1rem !important;
     border: none !important;
@@ -314,25 +314,25 @@
       <!-- ESTADÍSTICAS -->
       <div class="row g-3 mb-4">
         <div class="col-6">
-          <div class="card stat-card shadow-sm text-center p-3" style="background: linear-gradient(135deg, #ede9fe, #fce7f3);">
+          <div class="card stat-card shadow-sm text-center p-3">
             <h2 class="fw-bold text-primary mb-0"><%= tickets.length %></h2>
             <p class="small text-muted mb-0 fw-bold">Tickets</p>
           </div>
         </div>
         <div class="col-6">
-          <div class="card stat-card shadow-sm text-center p-3" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+          <div class="card stat-card shadow-sm text-center p-3">
             <h2 class="fw-bold text-warning mb-0"><%= wins ? wins.length : 0 %></h2>
             <p class="small text-muted mb-0 fw-bold">Ganados</p>
           </div>
         </div>
         <div class="col-6">
-          <div class="card stat-card shadow-sm text-center p-3" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+          <div class="card stat-card shadow-sm text-center p-3">
             <h2 class="fw-bold text-success mb-0"><%= activeTickets.length %></h2>
             <p class="small text-muted mb-0 fw-bold">En Juego</p>
           </div>
         </div>
         <div class="col-6">
-          <div class="card stat-card shadow-sm text-center p-3" style="background: linear-gradient(135deg, #fee2e2, #fecaca);">
+          <div class="card stat-card shadow-sm text-center p-3">
             <h2 class="fw-bold text-danger mb-0"><%= pendingPayments.length %></h2>
             <p class="small text-muted mb-0 fw-bold">Pendientes</p>
           </div>
@@ -341,7 +341,7 @@
 
       <!-- CTA -->
       <div class="card border-0 shadow-sm ticket-card overflow-hidden mb-4">
-        <div class="card-body p-4 text-center" style="background: linear-gradient(135deg, #faf5ff, #fdf2f8);">
+        <div class="card-body p-4 text-center">
           <div style="font-size: 2.5rem;">🍀</div>
           <h6 class="fw-bold mt-2">¡No te quedes con las ganas!</h6>
           <p class="text-muted small mb-3">Mientras más tickets compres, más oportunidades tienes de ganar.</p>

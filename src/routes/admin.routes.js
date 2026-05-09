@@ -25,4 +25,12 @@ router.get('/usuarios', adminController.getUsers);
 router.post('/usuarios/:id/regalar-tickets', adminController.giftTickets);
 router.get('/usuarios/exportar', adminController.exportData);
 
+// Negocios Aliados
+const businessController = require('../controllers/business.controller');
+router.get('/businesses', businessController.getAdminBusinesses);
+router.post('/businesses', businessController.createBusiness);
+router.get('/businesses/:id', businessController.getBusinessDetail);
+router.post('/businesses/:businessId/campaigns', businessController.createCampaign);
+router.post('/businesses/:businessId/campaigns/:campaignId/generate', businessController.generateCodes);
+
 module.exports = router;

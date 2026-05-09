@@ -1,0 +1,99 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Negocios Aliados</h2>
+    <a href="/admin" class="btn btn-outline-secondary">Volver al Panel</a>
+  </div>
+
+  <div class="row">
+    <!-- Formulario Crear Negocio -->
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header fw-bold text-white" style="background: linear-gradient(135deg, #10b981, #059669);">
+          ➕ Nuevo Negocio
+        </div>
+        <div class="card-body">
+          <form action="/admin/businesses" method="POST">
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Nombre del Negocio</label>
+              <input type="text" class="form-control" name="name" required placeholder="Ej: Pollería El Dorado">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Contacto (Nombre)</label>
+              <input type="text" class="form-control" name="contactName" placeholder="Ej: Carlos Pérez">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">WhatsApp / Teléfono</label>
+              <input type="text" class="form-control" name="phone" placeholder="999 999 999">
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-bold">Descripción de Promo</label>
+              <textarea class="form-control" name="promoDescription" rows="2" placeholder="Por compra mayor a S/20 recibe 1 ticket gratis"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Registrar Negocio</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Negocios -->
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Negocio</th>
+                  <th class="text-center">Comprados</th>
+                  <th class="text-center">Extra</th>
+                  <th class="text-center">Total</th>
+                  <th class="text-center">Usados</th>
+                  <th class="text-center">Disponibles</th>
+                  <th class="text-center">Estado</th>
+                  <th class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (businesses && businesses.length > 0) { %>
+                  <% businesses.forEach(biz => { %>
+                    <tr>
+                      <td>
+                        <div class="fw-bold"><%= biz.name %></div>
+                        <div class="small text-muted"><%= biz.phone || 'Sin teléfono' %></div>
+                      </td>
+                      <td class="text-center"><%= biz.stats.purchased %></td>
+                      <td class="text-center"><%= biz.stats.extra %></td>
+                      <td class="text-center fw-bold"><%= biz.stats.total %></td>
+                      <td class="text-center text-success fw-bold"><%= biz.stats.used %></td>
+                      <td class="text-center text-primary fw-bold"><%= biz.stats.available %></td>
+                      <td class="text-center">
+                        <span class="badge bg-<%= biz.status === 'active' ? 'success' : 'secondary' %>">
+                          <%= biz.status === 'active' ? 'Activo' : 'Inactivo' %>
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <a href="/admin/businesses/<%= biz._id %>" class="btn btn-sm btn-outline-primary">
+                          Ver Detalles
+                        </a>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                      No hay negocios registrados. Registra uno nuevo a la izquierda.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

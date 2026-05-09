@@ -1,0 +1,178 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">Negocio: <%= business.name %></h2>
+        <p class="text-muted mb-0">Gestión de campañas y códigos promocionales</p>
+    </div>
+    <a href="/admin/businesses" class="btn btn-outline-secondary">Volver a Negocios</a>
+  </div>
+
+  <div class="row">
+    <!-- INFO DEL NEGOCIO Y NUEVA CAMPAÑA -->
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-bottom fw-bold">
+          Información del Negocio
+        </div>
+        <div class="card-body">
+          <p class="mb-1"><strong>Contacto:</strong> <%= business.contactName || '-' %></p>
+          <p class="mb-1"><strong>WhatsApp:</strong> <%= business.phone || '-' %></p>
+          <p class="mb-1"><strong>Promoción:</strong> <%= business.promoDescription || '-' %></p>
+          <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-<%= business.status === 'active' ? 'success' : 'secondary' %>"><%= business.status %></span></p>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header fw-bold text-white" style="background: linear-gradient(135deg, #2563eb, #3b82f6);">
+          ➕ Nueva Campaña
+        </div>
+        <div class="card-body">
+          <form action="/admin/businesses/<%= business._id %>/campaigns" method="POST">
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Asignar a Sorteo</label>
+              <select name="raffleId" class="form-select" required>
+                <option value="">Selecciona un sorteo...</option>
+                <% raffles.forEach(r => { %>
+                  <option value="<%= r._id %>"><%= r.title %> (S/<%= r.prizeValue %>)</option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label small fw-bold">Tickets Comprados</label>
+                <input type="number" class="form-control" name="purchasedTickets" required min="1" value="10">
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label small fw-bold">Tickets Extra (Gratis)</label>
+                <input type="number" class="form-control" name="bonusTickets" required min="0" value="10">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Crear Campaña</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPAÑAS Y CÓDIGOS -->
+    <div class="col-md-8">
+      
+      <h4 class="fw-bold mb-3">Campañas Activas</h4>
+      <% if (campaigns && campaigns.length > 0) { %>
+        <% campaigns.forEach(camp => { %>
+            <div class="card border-0 shadow-sm mb-4 border-start border-4 border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">Campaña para: <%= camp.raffleId.title %></h5>
+                        <span class="badge bg-<%= camp.status === 'active' ? 'success' : 'secondary' %>"><%= camp.status %></span>
+                    </div>
+                    <div class="row text-center mb-3">
+                        <div class="col">
+                            <div class="small text-muted">Comprados</div>
+                            <div class="fw-bold fs-5"><%= camp.purchasedTickets %></div>
+                        </div>
+                        <div class="col">
+                            <div class="small text-muted">Extra</div>
+                            <div class="fw-bold fs-5"><%= camp.bonusTickets %></div>
+                        </div>
+                        <div class="col card border-0 bg-opacity-10 bg-primary rounded py-1">
+                            <div class="small text-muted">Total Códigos</div>
+                            <div class="fw-bold fs-5 text-primary"><%= camp.totalCodes %></div>
+                        </div>
+                        <div class="col">
+                            <div class="small text-muted">Usados</div>
+                            <div class="fw-bold fs-5 text-success"><%= camp.usedCodes %></div>
+                        </div>
+                        <div class="col">
+                            <div class="small text-muted">Disponibles</div>
+                            <div class="fw-bold fs-5 text-warning"><%= camp.availableCodes %></div>
+                        </div>
+                    </div>
+                    
+                    <% 
+                        // Contar cuántos códigos existen ya para esta campaña en la base de datos
+                        const codesForThisCampaign = codes.filter(c => c.campaignId._id.toString() === camp._id.toString());
+                        const existingCount = codesForThisCampaign.length;
+                        const remainingToGenerate = camp.totalCodes - existingCount;
+                    %>
+                    
+                    <% if (remainingToGenerate > 0) { %>
+                        <form action="/admin/businesses/<%= business._id %>/campaigns/<%= camp._id %>/generate" method="POST">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold">
+                                ⚙️ Generar <%= remainingToGenerate %> Códigos Faltantes
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <div class="alert alert-success py-2 mb-0 text-center">
+                            <i class="bi bi-check-circle-fill"></i> Todos los códigos han sido generados.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% }) %>
+      <% } else { %>
+        <div class="card text-center py-4 text-muted mb-4 shadow-sm border-0">
+          Este negocio no tiene campañas. Crea una nueva para empezar.
+        </div>
+      <% } %>
+
+      <!-- TABLA DE CÓDIGOS -->
+      <h4 class="fw-bold mb-3 mt-4">Todos los Códigos</h4>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Sorteo</th>
+                  <th>Estado</th>
+                  <th>Usado Por</th>
+                  <th>Fecha de Uso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (codes && codes.length > 0) { %>
+                  <% codes.forEach(c => { %>
+                    <tr>
+                      <td class="fw-bold font-monospace"><%= c.code %></td>
+                      <td class="small"><%= c.raffleId.title %></td>
+                      <td>
+                        <% if (c.status === 'used') { %>
+                            <span class="badge bg-success">Usado</span>
+                        <% } else if (c.status === 'expired') { %>
+                            <span class="badge bg-danger">Vencido</span>
+                        <% } else { %>
+                            <span class="badge bg-warning" style="color: #000 !important;">Disponible</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (c.usedBy) { %>
+                            <div class="small fw-bold"><%= c.usedBy.name %></div>
+                            <div class="small text-muted"><%= c.usedBy.email %></div>
+                        <% } else { %>
+                            <span class="text-muted">-</span>
+                        <% } %>
+                      </td>
+                      <td class="small text-muted">
+                        <%= c.usedAt ? new Date(c.usedAt).toLocaleString('es-PE') : '-' %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No se han generado códigos aún.</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

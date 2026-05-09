@@ -33,6 +33,8 @@ app.get('/health', (req, res) => res.status(200).json({ status: 'ok', timestamp:
 // Routes
 app.use('/', require('./routes/index.routes'));
 app.use('/', require('./routes/raffle.routes'));
+app.use('/', require('./routes/business.routes'));
+app.use('/recompensas', require('./routes/rewards.routes'));
 app.use('/auth', require('./routes/auth.routes'));
 app.use('/admin', require('./routes/admin.routes'));
 app.use('/pagos', require('./routes/payment.routes'));

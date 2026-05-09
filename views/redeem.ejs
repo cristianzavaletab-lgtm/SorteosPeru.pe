@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<div class="container py-5" style="min-height: 70vh;">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      
+      <div class="text-center mb-4">
+        <i class="bi bi-ticket-perforated-fill text-primary" style="font-size: 4rem;"></i>
+        <h2 class="fw-bold mt-2">Canjear Código</h2>
+        <p class="text-muted">¿Tienes un código promocional de algún negocio aliado? Ingrésalo aquí y reclama tu ticket gratis.</p>
+      </div>
+
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          
+          <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+              <div><%= error %></div>
+            </div>
+          <% } %>
+
+          <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+              <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+              <div><%= success %></div>
+            </div>
+            <div class="text-center mb-4">
+                <a href="/?tab=mis-tickets" class="btn btn-outline-success w-100">Ver mis tickets</a>
+            </div>
+          <% } %>
+
+          <form action="/canjear" method="POST">
+            <div class="mb-4">
+              <label class="form-label fw-bold" style="color: var(--text-light);">Ingresa tu código promocional:</label>
+              <input type="text" class="form-control form-control-lg text-center fw-bold" name="code" placeholder="EJEMPLO: DORADO-A8K2" required style="letter-spacing: 2px; text-transform: uppercase;">
+              <div class="form-text mt-2 text-center">Asegúrate de escribirlo exactamente como te lo entregaron.</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #2563eb, #3b82f6);">
+              <i class="bi bi-gift-fill me-2"></i> CANJEAR TICKET
+            </button>
+          </form>
+          
+        </div>
+      </div>
+      
+      <div class="text-center mt-4">
+          <a href="/negocios" class="text-decoration-none small fw-bold text-muted">
+            <i class="bi bi-shop me-1"></i> Ver negocios aliados activos
+          </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
