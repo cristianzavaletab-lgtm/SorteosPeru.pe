@@ -208,6 +208,61 @@
     console.log('PWA: App instalada correctamente');
     if (pwaBanner) pwaBanner.classList.add('d-none');
   });
+
+  // --- Push Notifications Logic ---
+  const VAPID_PUBLIC_KEY = 'BPU87mKUEnyvYNtBeCVnzpcXOk4ije29fPLVhUS31iD_Qp-Dx7oY_o66UBCEospG7jswmJm3peZsAalbiDhlD6c';
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
+  async function subscribeUserToPush() {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      
+      // Verificar si ya tiene suscripción
+      const existingSubscription = await registration.pushManager.getSubscription();
+      if (existingSubscription) return;
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+
+      await fetch('/push/subscribe', {
+        method: 'POST',
+        body: JSON.stringify({ subscription }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      console.log('PWA: Usuario suscrito a notificaciones push');
+    } catch (err) {
+      console.error('PWA: Error al suscribir a push:', err);
+    }
+  }
+
+  // Si el usuario está logueado, intentar suscribir
+  <% if (user) { %>
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      // Pedir permiso si aún no se tiene
+      if (Notification.permission === 'default') {
+        // Esperar 5 segundos para no agobiar al entrar
+        setTimeout(() => {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') subscribeUserToPush();
+          });
+        }, 5000);
+      } else if (Notification.permission === 'granted') {
+        subscribeUserToPush();
+      }
+    }
+  <% } %>
 </script>
 
 <!-- Contenido principal -->

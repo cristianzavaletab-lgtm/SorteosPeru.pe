@@ -4,6 +4,7 @@ const Ticket = require('../models/Ticket');
 const Winner = require('../models/Winner');
 const User = require('../models/User');
 const exceljs = require('exceljs');
+const pushController = require('./push.controller');
 const { generateTicketNumber } = require('../utils/generateTicket');
 const { drawRandomWinner } = require('../utils/drawWinner');
 
@@ -101,6 +102,13 @@ exports.approvePayment = async (req, res) => {
     io.emit('user_update', { userId: payment.userId._id, message: '¡Tu pago ha sido aprobado! Tienes nuevos tickets.' });
     io.emit('admin_update', { message: 'Pago aprobado y tickets generados' });
 
+    // Enviar Notificación Push
+    pushController.sendNotification(payment.userId._id, {
+      title: '✅ ¡Pago Aprobado!',
+      body: `Tu pago para "${payment.raffleId.title}" fue aprobado. ¡Mucha suerte! 🍀`,
+      url: '/dashboard'
+    });
+
     // Redirigir a WhatsApp con mensaje de aprobación
     const phone = payment.userId.phone.replace(/\s/g, '');
     const phoneFormatted = phone.startsWith('51') ? phone : '51' + phone;
@@ -135,6 +143,13 @@ exports.rejectPayment = async (req, res) => {
     const io = req.app.get('io');
     io.emit('user_update', { userId: payment.userId._id, message: `Tu pago fue rechazado: ${reason}` });
     io.emit('admin_update', { message: 'Pago rechazado' });
+
+    // Enviar Notificación Push
+    pushController.sendNotification(payment.userId._id, {
+      title: '❌ Pago Rechazado',
+      body: `Tu pago para "${payment.raffleId.title}" fue rechazado: ${reason}`,
+      url: '/dashboard'
+    });
 
     // Redirigir a WhatsApp con mensaje de rechazo
     const phone = payment.userId.phone.replace(/\s/g, '');
@@ -378,6 +393,13 @@ exports.giftTickets = async (req, res) => {
 
     const io = req.app.get('io');
     io.emit('user_update', { userId, message: '🎁 ¡Felicidades! Has recibido tickets de regalo del administrador.' });
+
+    // Enviar Notificación Push
+    pushController.sendNotification(userId, {
+      title: '🎁 ¡Tienes un Regalo!',
+      body: `El administrador te ha regalado ${qty} tickets para un sorteo. ¡Revísalos!`,
+      url: '/dashboard'
+    });
 
     res.redirect('/admin/usuarios?success=tickets_regalados');
   } catch (error) {

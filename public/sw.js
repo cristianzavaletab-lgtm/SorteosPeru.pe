@@ -67,3 +67,39 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+// Push Notifications Event
+self.addEventListener('push', (event) => {
+  let data = { title: 'SorteosPeru.pe', body: 'Tienes una nueva notificación' };
+  
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: '/images/icons/icon-192x192.png',
+    badge: '/images/logo-sp.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || '/dashboard'
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Click en la notificación
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.openWindow(event.notification.data.url)
+  );
+});

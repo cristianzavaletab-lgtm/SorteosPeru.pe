@@ -38,5 +38,6 @@ app.use('/recompensas', require('./routes/rewards.routes'));
 app.use('/auth', require('./routes/auth.routes'));
 app.use('/admin', require('./routes/admin.routes'));
 app.use('/pagos', require('./routes/payment.routes'));
+app.use('/push', require('./routes/push.routes'));
 
 module.exports = app;
