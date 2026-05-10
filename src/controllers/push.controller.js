@@ -70,3 +70,16 @@ exports.sendNotification = async (userId, payload) => {
     console.error('Error en sendNotification utility:', error);
   }
 };
+
+exports.testPush = async (req, res) => {
+  try {
+    await exports.sendNotification(req.user._id, {
+      title: '🔔 Notificación de Prueba',
+      body: '¡Genial! Tu sistema de notificaciones está funcionando correctamente. 🚀',
+      url: '/dashboard'
+    });
+    res.status(200).json({ message: 'Notificación de prueba enviada' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error enviando prueba' });
+  }
+};
