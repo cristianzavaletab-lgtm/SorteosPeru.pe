@@ -83,3 +83,35 @@ exports.testPush = async (req, res) => {
     res.status(500).json({ message: 'Error enviando prueba' });
   }
 };
+
+// Función para enviar notificaciones a TODOS los usuarios (ej: sorteo nuevo o inicio de vivo)
+exports.sendNotificationToAll = async (payload) => {
+  try {
+    const subscriptions = await PushSubscription.find();
+    
+    const notifications = subscriptions.map(sub => {
+      return webpush.sendNotification(sub.subscription, JSON.stringify(payload))
+        .catch(async (err) => {
+          if (err.statusCode === 404 || err.statusCode === 410) {
+            await PushSubscription.findByIdAndDelete(sub._id);
+          }
+        });
+    });
+
+    return Promise.all(notifications);
+  } catch (error) {
+    console.error('Error en sendNotificationToAll:', error);
+  }
+};
+
+exports.broadcastPush = async (req, res) => {
+  try {
+    const { title, body, url } = req.body;
+    if (!title || !body) return res.status(400).json({ message: 'Faltan datos' });
+
+    await exports.sendNotificationToAll({ title, body, url: url || '/' });
+    res.status(200).json({ message: 'Notificación masiva enviada' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error en envío masivo' });
+  }
+};
