@@ -1,0 +1,23 @@
+{
+  "name": "SorteosPeru.pe",
+  "short_name": "SorteosPeru",
+  "description": "Gana premios reales con SorteosPeru.pe",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#160d25",
+  "theme_color": "#5B21B6",
+  "icons": [
+    {
+      "src": "/images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
