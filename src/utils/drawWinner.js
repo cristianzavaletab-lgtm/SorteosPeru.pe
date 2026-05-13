@@ -10,11 +10,20 @@ const drawRandomWinner = async (raffleId) => {
 
   // Identificar usuarios que han comprado al menos 1 ticket
   const paidTickets = validTickets.filter(t => t.paymentId != null);
-  const usersWithPurchases = new Set(paidTickets.map(t => t.userId.toString()));
+  
+  // Usar userId si existe, sino guestPhone como identificador único
+  const usersWithPurchases = new Set(paidTickets.map(t => t.userId ? t.userId.toString() : t.guestPhone));
 
   // Dividir tickets en prioritarios y no prioritarios
-  const priorityTickets = validTickets.filter(t => usersWithPurchases.has(t.userId.toString()));
-  const lowPriorityTickets = validTickets.filter(t => !usersWithPurchases.has(t.userId.toString()));
+  const priorityTickets = validTickets.filter(t => {
+    const id = t.userId ? t.userId.toString() : t.guestPhone;
+    return usersWithPurchases.has(id);
+  });
+  
+  const lowPriorityTickets = validTickets.filter(t => {
+    const id = t.userId ? t.userId.toString() : t.guestPhone;
+    return !usersWithPurchases.has(id);
+  });
 
   let winningTicket;
 

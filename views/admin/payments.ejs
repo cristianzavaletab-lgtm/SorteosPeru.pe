@@ -27,8 +27,19 @@
                 <tr>
                   <td class="px-4 py-3 align-middle"><%= payment.createdAt.toLocaleDateString() %></td>
                   <td class="py-3 align-middle">
-                    <div class="fw-bold"><%= payment.userId ? payment.userId.name : 'N/A' %></div>
-                    <div class="small text-muted"><%= payment.userId ? payment.userId.phone : 'N/A' %></div>
+                    <% if (payment.userId) { %>
+                      <div class="fw-bold"><%= payment.userId.name %></div>
+                      <div class="small text-muted"><%= payment.userId.phone %></div>
+                    <% } else if (payment.guestName) { %>
+                      <div class="fw-bold"><%= payment.guestName %> <span class="badge bg-secondary ms-1">Invitado</span></div>
+                      <div class="small text-muted"><%= payment.guestPhone %></div>
+                    <% } else { %>
+                      <div class="fw-bold">N/A</div>
+                    <% } %>
+                    
+                    <% if (payment.vendorId) { %>
+                      <div class="mt-1 small"><span class="badge bg-dark"><i class="bi bi-person-badge me-1"></i>Vendedor</span></div>
+                    <% } %>
                   </td>
                   <td class="py-3 align-middle"><%= payment.raffleId ? payment.raffleId.title : 'Sorteo Eliminado' %></td>
                   <td class="py-3 align-middle fw-bold text-success">
@@ -40,16 +51,28 @@
                   <td class="py-3 align-middle">
                     <% 
                       const isYape = payment.paymentMethod === 'yape';
-                      const badgeClass = isYape ? 'bg-purple' : 'bg-info';
-                      const badgeStyle = isYape ? 'background-color: #742284;' : '';
+                      const isPlin = payment.paymentMethod === 'plin';
+                      const isCash = payment.paymentMethod === 'cash';
+                      let badgeClass = 'bg-info';
+                      let badgeStyle = '';
+                      if (isYape) { badgeClass = 'bg-purple'; badgeStyle = 'background-color: #742284;'; }
+                      else if (isPlin) { badgeClass = 'bg-info'; }
+                      else if (isCash) { badgeClass = 'bg-success'; }
                     %>
-                    <span class="badge <%= badgeClass %>" style="<%= badgeStyle %>">
+                    <span class="badge <%= badgeClass %> mb-1" style="<%= badgeStyle %>">
                       <%= (payment.paymentMethod || 'N/A').toUpperCase() %>
                     </span>
+                    <% if (payment.paymentDestination === 'vendor') { %>
+                      <div class="small text-muted"><i class="bi bi-person-bounding-box me-1"></i>Pagó al Vendedor</div>
+                    <% } else { %>
+                      <div class="small text-muted"><i class="bi bi-bank me-1"></i>Cuenta Oficial</div>
+                    <% } %>
                   </td>
                   <td class="py-3 align-middle">
                     <% if (payment.receiptImage) { %>
-                      <a href="<%= payment.receiptImage %>" target="_blank" class="btn btn-sm btn-outline-primary">Ver Imagen</a>
+                      <a href="/uploads/<%= payment.receiptImage %>" target="_blank" class="btn btn-sm btn-outline-primary">Ver Imagen</a>
+                    <% } else if (payment.paymentDestination === 'vendor') { %>
+                      <span class="text-warning small"><i class="bi bi-exclamation-triangle me-1"></i>Pendiente rendición</span>
                     <% } else { %>
                       <span class="text-muted small">Sin imagen</span>
                     <% } %>

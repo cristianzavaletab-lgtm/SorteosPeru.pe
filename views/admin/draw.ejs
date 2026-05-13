@@ -11,7 +11,7 @@
     border-radius: 1.5rem;
     border: 6px solid #7c3aed;
     box-shadow: 0 15px 40px rgba(124, 58, 237, 0.3);
-    background: #fff;
+    background: var(--bg-darker);
     perspective: 1000px;
   }
   
@@ -26,11 +26,11 @@
   }
   .slot-container::before {
     top: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom, var(--bg-darker) 0%, transparent 100%);
   }
   .slot-container::after {
     bottom: 0;
-    background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to top, var(--bg-darker) 0%, transparent 100%);
   }
   
   .slot-pointer {
@@ -71,8 +71,8 @@
     justify-content: center;
     font-weight: 700;
     font-size: 1.1rem;
-    color: #1e1b4b;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border-color);
     transition: filter 0.3s;
   }
   
@@ -145,7 +145,7 @@
         </div>
 
         <div class="slot-container mb-4" id="slotContainer" 
-             data-tickets='<%- JSON.stringify(tickets.map(t => ({ number: t.ticketNumber, name: t.userId.name }))) %>'
+             data-tickets='<%- JSON.stringify(tickets.map(t => ({ number: t.ticketNumber, name: t.userId ? t.userId.name : (t.guestName || "Invitado") }))) %>'
              data-raffle-id="<%= raffle._id %>">
           <div class="slot-pointer"></div>
           <div class="slot-strip" id="slotStrip"></div>
@@ -169,7 +169,7 @@
           <div class="d-flex justify-content-center gap-2 mb-3">
             <span class="badge bg-primary fs-5 px-3 py-2" id="winnerTicket"></span>
           </div>
-          <h4 class="fw-bold text-dark" id="winnerPrize"></h4>
+          <h4 class="fw-bold text-theme-light" id="winnerPrize"></h4>
         </div>
         
         <div class="d-grid gap-2">

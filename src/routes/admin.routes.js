@@ -25,6 +25,10 @@ router.get('/usuarios', adminController.getUsers);
 router.post('/usuarios/:id/regalar-tickets', adminController.giftTickets);
 router.get('/usuarios/exportar', adminController.exportData);
 
+// Vendedores
+router.get('/vendedores', adminController.getVendors);
+router.post('/vendedores', adminController.createVendor);
+
 // Negocios Aliados
 const businessController = require('../controllers/business.controller');
 router.get('/businesses', businessController.getAdminBusinesses);

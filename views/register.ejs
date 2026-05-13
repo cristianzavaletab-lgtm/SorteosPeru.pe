@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-12 mb-3">
               <label class="form-label text-muted small fw-bold">WhatsApp (9 dígitos)</label>
-              <input type="tel" class="form-control form-control-lg" name="phone" required pattern="[0-9]{9}" placeholder="999888777">
+              <input type="tel" class="form-control form-control-lg" name="phone" required pattern="[0-9]{9}" placeholder="999888777" value="<%= typeof phone !== 'undefined' ? phone : '' %>">
               <div class="form-text small">Debe ser un número real para contactarte.</div>
             </div>
             <div class="col-md-12 mb-3">

@@ -2,6 +2,7 @@ const Raffle = require('../models/Raffle');
 const Payment = require('../models/Payment');
 const Ticket = require('../models/Ticket');
 const Winner = require('../models/Winner');
+const { sendNotification } = require('../utils/notifications');
 const User = require('../models/User');
 const exceljs = require('exceljs');
 const pushController = require('./push.controller');
@@ -73,22 +74,39 @@ exports.approvePayment = async (req, res) => {
     payment.approvedAt = Date.now();
     await payment.save();
 
-    // Generar N tickets según la cantidad comprada y dar créditos (20 por ticket)
-    const qty = payment.ticketQty || 1;
+    // Verificar si ya existen tickets pendientes (ej. venta de vendedor)
+    const existingPendingTickets = await Ticket.find({ paymentId: payment._id, status: 'pending' });
     const ticketNumbers = [];
-    for (let i = 0; i < qty; i++) {
-      const ticketNumber = await generateTicketNumber();
-      await Ticket.create({
-        userId: payment.userId._id,
-        raffleId: payment.raffleId._id,
-        paymentId: payment._id,
-        ticketNumber
-      });
-      ticketNumbers.push(ticketNumber);
+    const qty = payment.ticketQty || 1;
+
+    if (existingPendingTickets.length > 0) {
+      // Es una venta de vendedor, solo actualizar estado
+      for (const ticket of existingPendingTickets) {
+        ticket.status = 'valid';
+        await ticket.save();
+        ticketNumbers.push(ticket.ticketNumber);
+      }
+    } else {
+      // Venta web normal, generar tickets
+      for (let i = 0; i < qty; i++) {
+        const ticketNumber = await generateTicketNumber();
+        const ticketData = {
+          raffleId: payment.raffleId._id,
+          paymentId: payment._id,
+          ticketNumber,
+          status: 'valid'
+        };
+        if (payment.userId) ticketData.userId = payment.userId._id;
+        if (payment.guestName) ticketData.guestName = payment.guestName;
+        if (payment.guestPhone) ticketData.guestPhone = payment.guestPhone;
+
+        await Ticket.create(ticketData);
+        ticketNumbers.push(ticketNumber);
+      }
     }
 
-    // Premiar con 10-20 créditos SP SOLO si compró más de 2 tickets
-    if (qty > 2) {
+    // Premiar con 10-20 créditos SP SOLO si compró más de 2 tickets y tiene cuenta
+    if (qty > 2 && payment.userId) {
       const spPerTicket = Math.floor(Math.random() * 11) + 10; // 10 a 20
       const creditsAwarded = qty * spPerTicket;
       const user = await User.findById(payment.userId._id);
@@ -99,31 +117,51 @@ exports.approvePayment = async (req, res) => {
     }
 
     const io = req.app.get('io');
-    io.emit('user_update', { userId: payment.userId._id, message: '¡Tu pago ha sido aprobado! Tienes nuevos tickets.' });
+    if (payment.userId) {
+      io.emit('user_update', { userId: payment.userId._id, message: '¡Tu pago ha sido aprobado! Tienes nuevos tickets.' });
+    }
     io.emit('admin_update', { message: 'Pago aprobado y tickets generados' });
 
-    // Enviar Notificación Push
-    pushController.sendNotification(payment.userId._id, {
-      title: '✅ ¡Pago Aprobado!',
-      body: `Tu pago para "${payment.raffleId.title}" fue aprobado. ¡Mucha suerte! 🍀`,
-      url: '/dashboard'
+    // Enviar Notificación Push si es usuario web
+    if (payment.userId) {
+      pushController.sendNotification(payment.userId._id, {
+        title: '✅ ¡Pago Aprobado!',
+        body: `Tu pago para "${payment.raffleId.title}" fue aprobado. ¡Mucha suerte! 🍀`,
+        url: '/dashboard'
+      });
+    }
+
+    // Notificación Persistente para el Vendedor
+    await sendNotification(req.app, {
+      recipientId: payment.vendorId,
+      role: 'vendor',
+      title: 'Venta Aprobada',
+      message: `Tu registro de venta por S/ ${payment.amount} para ${payment.guestName || 'un cliente'} ha sido aprobado.`,
+      type: 'sale_approved',
+      link: '/vendor/dashboard'
     });
 
     // Redirigir a WhatsApp con mensaje de aprobación
-    const phone = payment.userId.phone.replace(/\s/g, '');
-    const phoneFormatted = phone.startsWith('51') ? phone : '51' + phone;
-    const ticketList = ticketNumbers.map(t => `🎫 *${t}*`).join('\n');
-    const message = encodeURIComponent(
-      `¡Hola ${payment.userId.name}! 🎉\n\n` +
-      `Tu pago de S/${payment.amount.toFixed(2)} para el sorteo "${payment.raffleId.title}" ha sido *APROBADO* ✅\n\n` +
-      `${qty > 1 ? `Tus ${qty} tickets son:\n` : 'Tu ticket es:\n'}` +
-      `${ticketList}\n\n` +
-      `¡Ya estás participando! Te avisaremos cuando se realice el sorteo.\n\n` +
-      `Buena suerte 🍀\n` +
-      `— SorteosPeru.pe`
-    );
+    const phone = payment.userId ? payment.userId.phone : payment.guestPhone;
+    const name = payment.userId ? payment.userId.name : payment.guestName;
     
-    res.redirect(`https://wa.me/${phoneFormatted}?text=${message}`);
+    if (phone) {
+      const cleanPhone = phone.replace(/\s/g, '');
+      const phoneFormatted = cleanPhone.startsWith('51') ? cleanPhone : '51' + cleanPhone;
+      const ticketList = ticketNumbers.map(t => `🎫 *${t}*`).join('\n');
+      const message = encodeURIComponent(
+        `¡Hola ${name}! 🎉\n\n` +
+        `Tu pago de S/${payment.amount.toFixed(2)} para el sorteo "${payment.raffleId.title}" ha sido *APROBADO* ✅\n\n` +
+        `${qty > 1 ? `Tus ${qty} tickets son:\n` : 'Tu ticket es:\n'}` +
+        `${ticketList}\n\n` +
+        `¡Ya estás participando! Te avisaremos cuando se realice el sorteo.\n\n` +
+        `Buena suerte 🍀\n` +
+        `— SorteosPeru.pe`
+      );
+      return res.redirect(`https://wa.me/${phoneFormatted}?text=${message}`);
+    }
+    
+    return res.redirect('/admin/pagos');
   } catch (error) {
     console.error(error);
     res.status(500).send('Error al aprobar el pago');
@@ -140,29 +178,58 @@ exports.rejectPayment = async (req, res) => {
     payment.rejectionReason = reason;
     await payment.save();
 
+    // Cancelar tickets pendientes si existen
+    const existingPendingTickets = await Ticket.find({ paymentId: payment._id, status: 'pending' });
+    if (existingPendingTickets.length > 0) {
+      for (const ticket of existingPendingTickets) {
+        ticket.status = 'cancelled';
+        await ticket.save();
+      }
+    }
+
     const io = req.app.get('io');
-    io.emit('user_update', { userId: payment.userId._id, message: `Tu pago fue rechazado: ${reason}` });
+    if (payment.userId) {
+      io.emit('user_update', { userId: payment.userId._id, message: `Tu pago fue rechazado: ${reason}` });
+    }
     io.emit('admin_update', { message: 'Pago rechazado' });
 
-    // Enviar Notificación Push
-    pushController.sendNotification(payment.userId._id, {
-      title: '❌ Pago Rechazado',
-      body: `Tu pago para "${payment.raffleId.title}" fue rechazado: ${reason}`,
-      url: '/dashboard'
+    // Enviar Notificación Push si es usuario web
+    if (payment.userId) {
+      pushController.sendNotification(payment.userId._id, {
+        title: '❌ Pago Rechazado',
+        body: `Tu pago para "${payment.raffleId.title}" fue rechazado: ${reason}`,
+        url: '/dashboard'
+      });
+    }
+
+    // Notificación Persistente para el Vendedor
+    await sendNotification(req.app, {
+      recipientId: payment.vendorId,
+      role: 'vendor',
+      title: 'Venta Rechazada',
+      message: `Tu registro de venta por S/ ${payment.amount} ha sido rechazado.`,
+      type: 'sale_rejected',
+      link: '/vendor/dashboard'
     });
 
     // Redirigir a WhatsApp con mensaje de rechazo
-    const phone = payment.userId.phone.replace(/\s/g, '');
-    const phoneFormatted = phone.startsWith('51') ? phone : '51' + phone;
-    const message = encodeURIComponent(
-      `Hola ${payment.userId.name},\n\n` +
-      `Tu pago de S/${payment.amount.toFixed(2)} para el sorteo "${payment.raffleId.title}" fue *RECHAZADO* ❌\n\n` +
-      `📋 Motivo: ${reason}\n\n` +
-      `Puedes volver a intentarlo subiendo un comprobante válido.\n\n` +
-      `— SorteosPeru.pe`
-    );
+    const phone = payment.userId ? payment.userId.phone : payment.guestPhone;
+    const name = payment.userId ? payment.userId.name : payment.guestName;
     
-    res.redirect(`https://wa.me/${phoneFormatted}?text=${message}`);
+    if (phone) {
+      const cleanPhone = phone.replace(/\s/g, '');
+      const phoneFormatted = cleanPhone.startsWith('51') ? cleanPhone : '51' + cleanPhone;
+      const message = encodeURIComponent(
+        `Hola ${name},\n\n` +
+        `Tu pago de S/${payment.amount.toFixed(2)} para el sorteo "${payment.raffleId.title}" fue *RECHAZADO* ❌\n\n` +
+        `📋 Motivo: ${reason}\n\n` +
+        `Puedes comunicarte con nosotros para solucionarlo.\n\n` +
+        `— SorteosPeru.pe`
+      );
+      return res.redirect(`https://wa.me/${phoneFormatted}?text=${message}`);
+    }
+    
+    return res.redirect('/admin/pagos');
   } catch (error) {
     console.error(error);
     res.status(500).send('Error al rechazar el pago');
@@ -211,7 +278,17 @@ exports.createRaffle = async (req, res) => {
     if (req.file) {
       data.image = `/uploads/${req.file.filename}`;
     }
-    await Raffle.create(data);
+    const raffle = await Raffle.create(data);
+
+    // Notificar a todos sobre el nuevo sorteo
+    await sendNotification(req.app, {
+      role: 'all',
+      title: '¡Nuevo Sorteo Disponible! 🎁',
+      message: `Se ha activado el sorteo "${raffle.title}". ¡Compra tu ticket ahora!`,
+      type: 'system',
+      link: '/sorteos/' + raffle._id
+    });
+
     res.redirect('/admin/sorteos');
   } catch (error) {
     console.error(error);
@@ -233,7 +310,18 @@ exports.updateRaffle = async (req, res) => {
     raffle.endDate = req.body.endDate || null;
     raffle.drawDate = req.body.drawDate || null;
     raffle.streamUrl = req.body.streamUrl || null;
+    const oldStatus = raffle.status;
     raffle.status = req.body.status;
+    
+    if (raffle.status === 'active' && oldStatus !== 'active') {
+      await sendNotification(req.app, {
+        role: 'all',
+        title: '¡Sorteo Activado! 🚀',
+        message: `El sorteo "${raffle.title}" ya está disponible para participar.`,
+        type: 'system',
+        link: '/sorteos/' + raffle._id
+      });
+    }
     
     if (req.file) {
       raffle.image = `/uploads/${req.file.filename}`;
@@ -270,22 +358,46 @@ exports.executeDraw = async (req, res) => {
     raffle.winnerTicketId = winningTicket._id;
     await raffle.save();
 
-    const winnerUser = await User.findById(winningTicket.userId);
-
-    const winner = await Winner.create({
+    let winnerData = {
       raffleId: raffle._id,
-      userId: winningTicket.userId,
       ticketId: winningTicket._id,
       prizeValue: raffle.prizeValue
-    });
+    };
+
+    let winnerName = winningTicket.guestName || 'Usuario Desconocido';
+    let winnerPhone = winningTicket.guestPhone || 'Sin número';
+
+    if (winningTicket.userId) {
+      const winnerUser = await User.findById(winningTicket.userId);
+      winnerData.userId = winningTicket.userId;
+      if (winnerUser) {
+        winnerName = winnerUser.name;
+        winnerPhone = winnerUser.phone;
+      }
+    } else {
+      winnerData.guestName = winningTicket.guestName;
+      winnerData.guestPhone = winningTicket.guestPhone;
+    }
+
+    const winner = await Winner.create(winnerData);
+
+    // Notificar al Ganador (si es usuario registrado)
+    if (winningTicket.userId) {
+      await sendNotification(req.app, {
+        recipientId: winningTicket.userId,
+        role: 'user',
+        title: '¡ERES EL GANADOR! 🏆',
+        message: `¡Felicidades! Ganaste el premio de S/ ${raffle.prizeValue} en el sorteo "${raffle.title}".`,
+        type: 'winner',
+        link: '/mis-tickets'
+      });
+    }
 
     // Devolver JSON para la ruleta
     res.json({
       success: true,
       winner: {
-        id: winner._id,
-        name: winnerUser.name,
-        phone: winnerUser.phone,
+        name: winnerName,
         ticketNumber: winningTicket.ticketNumber,
         prize: raffle.prizeValue
       }
@@ -467,5 +579,69 @@ exports.exportData = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Error al exportar datos');
+  }
+};
+
+// --- Gestión de Vendedores ---
+const bcrypt = require('bcryptjs');
+
+exports.getVendors = async (req, res) => {
+  try {
+    const vendors = await User.find({ role: 'vendor' }).sort({ createdAt: -1 });
+    
+    // Calcular estadísticas por vendedor
+    const vendorsWithStats = await Promise.all(vendors.map(async (vendor) => {
+      const sales = await Payment.find({ vendorId: vendor._id, status: 'approved' });
+      const pendingSales = await Payment.find({ vendorId: vendor._id, status: { $in: ['pending', 'reviewing'] } });
+      
+      let totalAmountSold = 0;
+      let amountCollectedByVendor = 0; // Efectivo o Yape que el vendedor tiene en el bolsillo
+
+      sales.forEach(s => {
+        totalAmountSold += s.amount;
+        if (s.paymentDestination === 'vendor') {
+          amountCollectedByVendor += s.amount;
+        }
+      });
+      
+      const estimatedCommission = (totalAmountSold * (vendor.commissionRate || 0)) / 100;
+      const amountToRemitToAdmin = amountCollectedByVendor - estimatedCommission;
+      
+      return {
+        ...vendor.toObject(),
+        approvedSalesCount: sales.length,
+        pendingSalesCount: pendingSales.length,
+        totalAmountSold,
+        amountCollectedByVendor,
+        estimatedCommission,
+        amountToRemitToAdmin: amountToRemitToAdmin > 0 ? amountToRemitToAdmin : 0
+      };
+    }));
+
+    res.render('admin/vendors', { vendors: vendorsWithStats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener vendedores');
+  }
+};
+
+exports.createVendor = async (req, res) => {
+  try {
+    const { name, email, phone, password, vendorCode, commissionRate } = req.body;
+    
+    await User.create({
+      name,
+      email,
+      phone,
+      password, // The pre-save hook in User schema will hash this
+      role: 'vendor',
+      vendorCode,
+      commissionRate: parseFloat(commissionRate) || 0
+    });
+
+    res.redirect('/admin/vendedores?success=Vendedor Creado');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al crear vendedor');
   }
 };

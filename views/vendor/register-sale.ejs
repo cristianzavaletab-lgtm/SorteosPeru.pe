@@ -1,0 +1,182 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5" style="max-width: 800px; min-height: 80vh;">
+    <!-- Encabezado -->
+    <div class="d-flex align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-4">
+        <a href="/vendor/dashboard" class="btn btn-outline-secondary rounded-circle me-4 d-flex justify-content-center align-items-center" style="width: 45px; height: 45px;">
+            <i class="bi bi-arrow-left fs-5"></i>
+        </a>
+        <div>
+            <h1 class="fw-bold mb-1" style="background: linear-gradient(135deg, var(--text-light), var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Registrar Nueva Venta
+            </h1>
+            <p class="text-muted mb-0">Completa los datos para generar tickets pendientes</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+        <div class="position-absolute top-0 end-0 rounded-circle" style="width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,197,66,0.1) 0%, rgba(245,197,66,0) 70%); transform: translate(30%, -30%); pointer-events: none;"></div>
+        
+        <div class="card-body p-4 p-md-5">
+            <form action="/vendor/register-sale" method="POST" enctype="multipart/form-data" id="saleForm">
+                
+                <!-- Sorteo -->
+                <div class="p-4 rounded-4 mb-5" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);">
+                    <label class="form-label fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="bi bi-trophy-fill text-warning me-2 fs-5"></i>Sorteo a Participar
+                    </label>
+                    <select name="raffleId" id="raffleSelect" class="form-select form-select-lg" required>
+                        <option value="" disabled selected>-- Elige un Sorteo Activo --</option>
+                        <% raffles.forEach(raffle => { %>
+                            <option value="<%= raffle._id %>" data-price="<%= raffle.ticketPrice %>" style="background: var(--bg-darker); color: var(--text-light);">
+                                <%= raffle.title %> - S/ <%= raffle.ticketPrice %> c/u
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="row g-5 mb-5">
+                    <!-- Datos del Cliente -->
+                    <div class="col-md-6">
+                        <h4 class="fw-bold text-warning border-bottom border-secondary border-opacity-25 pb-3 mb-4 d-flex align-items-center">
+                            <i class="bi bi-person-lines-fill me-2 opacity-75"></i> Datos del Cliente
+                        </h4>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-light">Nombre del Cliente</label>
+                            <input type="text" name="guestName" class="form-control form-control-lg" placeholder="Ej. Juan Pérez" required>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label text-light">Teléfono (WhatsApp)</label>
+                            <input type="tel" name="guestPhone" class="form-control form-control-lg" placeholder="Ej. 987654321" required>
+                            <div class="form-text mt-2"><i class="bi bi-whatsapp text-success me-1"></i> A este número le llegará su confirmación</div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de la Venta -->
+                    <div class="col-md-6">
+                        <h4 class="fw-bold text-warning border-bottom border-secondary border-opacity-25 pb-3 mb-4 d-flex align-items-center">
+                            <i class="bi bi-ticket-perforated me-2 opacity-75"></i> Compra
+                        </h4>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-light">Cantidad de Tickets</label>
+                            <div class="input-group input-group-lg">
+                                <input type="number" name="ticketQty" id="ticketQty" class="form-control fw-bold" value="1" min="1" required style="border-right: none;">
+                                <span class="input-group-text bg-transparent border-start-0 text-muted fw-medium">Tickets</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label text-light">Monto Total a Cobrar</label>
+                            <div class="input-group input-group-lg shadow-sm">
+                                <span class="input-group-text fw-bold text-success" style="background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3);">S/</span>
+                                <input type="number" name="amount" id="totalAmount" class="form-control fw-bold text-success fs-3" readonly value="0.00" style="background: rgba(34, 197, 94, 0.05); border-color: rgba(34, 197, 94, 0.3);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div class="pt-4 border-top border-secondary border-opacity-25 mb-5">
+                    <h4 class="fw-bold text-warning mb-4 d-flex align-items-center">
+                        <i class="bi bi-wallet2 me-2 opacity-75"></i> Información de Pago
+                    </h4>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-light">¿A dónde pagó el cliente?</label>
+                            <select name="paymentDestination" id="paymentDestination" class="form-select form-select-lg shadow-sm" style="background-color: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);" required>
+                                <option value="official" style="background: var(--bg-darker);">Al Yape/Cuenta Oficial de la Empresa</option>
+                                <option value="vendor" style="background: var(--bg-darker);">En Efectivo/Yape directamente a MÍ</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-light">Método Usado</label>
+                            <select name="paymentMethod" id="paymentMethod" class="form-select form-select-lg" required>
+                                <option value="yape" style="background: var(--bg-darker);">Yape</option>
+                                <option value="plin" style="background: var(--bg-darker);">Plin</option>
+                                <option value="transfer" style="background: var(--bg-darker);">Transferencia Bancaria</option>
+                                <option value="cash" id="cashOption" style="display:none; background: var(--bg-darker);">Efectivo Físico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="receiptContainer" class="p-4 rounded-4" style="background: rgba(0,0,0,0.2); border: 1px dashed var(--card-border);">
+                        <label class="form-label text-light fw-medium d-flex align-items-center mb-1">
+                            <i class="bi bi-camera-fill text-muted me-2"></i> Captura del Comprobante
+                        </label>
+                        <p class="text-warning small fw-medium mb-3" id="receiptHelpText">⚠️ Requisito obligatorio para pagos a la cuenta oficial</p>
+                        <input type="file" name="receiptImage" id="receiptImage" class="form-control" accept="image/*">
+                    </div>
+                </div>
+
+                <!-- Info Message -->
+                <div class="alert d-flex align-items-center mb-5 rounded-4 border-0 shadow-sm" style="background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6 !important;">
+                    <i class="bi bi-info-circle-fill text-info fs-3 me-4"></i>
+                    <div class="small text-light" style="opacity: 0.9;">
+                        <strong class="text-info d-block mb-1">Regla del Sistema:</strong> 
+                        Al registrar esta venta, los tickets se crearán en estado <span class="badge bg-info text-dark">Pendiente</span>. El cliente participará oficialmente en el sorteo <strong>únicamente cuando el Administrador verifique y apruebe el pago</strong> desde el panel central.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-4 fw-bold fs-5 shadow position-relative overflow-hidden group">
+                    <i class="bi bi-check2-circle me-2 fs-4 align-middle"></i> Confirmar y Generar Tickets
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const raffleSelect = document.getElementById('raffleSelect');
+        const ticketQtyInput = document.getElementById('ticketQty');
+        const totalAmountInput = document.getElementById('totalAmount');
+        const destSelect = document.getElementById('paymentDestination');
+        const methodSelect = document.getElementById('paymentMethod');
+        const cashOption = document.getElementById('cashOption');
+        const receiptImage = document.getElementById('receiptImage');
+        const receiptContainer = document.getElementById('receiptContainer');
+        const receiptHelpText = document.getElementById('receiptHelpText');
+
+        function calculateTotal() {
+            const selectedOption = raffleSelect.options[raffleSelect.selectedIndex];
+            if (!selectedOption.value) return;
+            
+            const price = parseFloat(selectedOption.dataset.price);
+            const qty = parseInt(ticketQtyInput.value) || 1;
+            totalAmountInput.value = (price * qty).toFixed(2);
+        }
+
+        raffleSelect.addEventListener('change', calculateTotal);
+        ticketQtyInput.addEventListener('input', calculateTotal);
+
+        function updatePaymentLogic() {
+            if (destSelect.value === 'vendor') {
+                cashOption.style.display = 'block';
+                receiptImage.required = false;
+                receiptContainer.style.opacity = '0.7';
+                receiptHelpText.innerText = "Opcional (El pago lo tienes tú)";
+                receiptHelpText.classList.replace('text-warning', 'text-muted');
+            } else {
+                cashOption.style.display = 'none';
+                if (methodSelect.value === 'cash') {
+                    methodSelect.value = 'yape';
+                }
+                receiptImage.required = true;
+                receiptContainer.style.opacity = '1';
+                receiptHelpText.innerText = "⚠️ Requisito obligatorio para pagos a la cuenta oficial";
+                receiptHelpText.classList.replace('text-muted', 'text-warning');
+            }
+        }
+
+        destSelect.addEventListener('change', updatePaymentLogic);
+        updatePaymentLogic(); // Init
+        calculateTotal();
+    });
+</script>
+
+<%- include('../partials/footer') %>

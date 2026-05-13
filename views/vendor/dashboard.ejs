@@ -1,0 +1,198 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5" style="min-height: 80vh;">
+    <!-- Encabezado -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <div class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-shield-check me-1"></i> Agente Autorizado
+            </div>
+            <h1 class="fw-bold mb-1" style="background: linear-gradient(135deg, var(--text-light), var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Panel de Vendedor
+            </h1>
+            <p class="text-muted mb-0 fs-5">
+                Tu código oficial: 
+                <span class="badge border border-warning text-warning font-monospace fs-6 px-3 py-2 ms-1" style="background: var(--bg-darker); box-shadow: 0 0 15px var(--glow-gold);">
+                    <%= user.vendorCode %>
+                </span>
+            </p>
+        </div>
+        <a href="/vendor/register-sale" class="btn btn-primary btn-lg rounded-pill shadow d-flex align-items-center">
+            <i class="bi bi-plus-circle-fill me-2 fs-4"></i> Registrar Venta
+        </a>
+    </div>
+
+    <% if (typeof success !== 'undefined' || (locals.query && locals.query.success)) { %>
+        <div class="alert alert-success d-flex align-items-center shadow-sm rounded-4 border-0 mb-5" style="background: rgba(34, 197, 94, 0.15); color: #86efac; border-left: 4px solid #22c55e !important;">
+            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+            <div>
+                <strong>¡Éxito!</strong> <%= typeof success !== 'undefined' ? success : locals.query.success %>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row g-4 mb-5">
+        <!-- Aprobados -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid var(--accent-color) !important;">
+                <div class="card-body p-4 position-relative overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem; letter-spacing: 1px;">Tickets Aprobados</h6>
+                            <h2 class="display-5 fw-bold text-theme-light mb-0"><%= stats.approvedTicketsCount %></h2>
+                        </div>
+                        <div class="how-it-works-icon m-0" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="bi bi-ticket-perforated-fill"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px; background-color: var(--bg-darker);">
+                        <div class="progress-bar" style="width: 100%; background-color: var(--accent-color);" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pendientes -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid #3b82f6 !important;">
+                <div class="card-body p-4 position-relative overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem; letter-spacing: 1px;">En Revisión</h6>
+                            <h2 class="display-5 fw-bold text-theme-light mb-0"><%= stats.pendingTicketsCount %></h2>
+                        </div>
+                        <div class="how-it-works-icon m-0" style="width: 50px; height: 50px; font-size: 1.5rem; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa;">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                    <p class="text-info small mb-0 fw-semibold"><i class="bi bi-info-circle me-1"></i>Esperando al admin</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rechazados -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm" style="border-left: 4px solid #ef4444 !important;">
+                <div class="card-body p-4 position-relative overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem; letter-spacing: 1px;">Rechazados</h6>
+                            <h2 class="display-5 fw-bold text-theme-light mb-0"><%= stats.rejectedTicketsCount %></h2>
+                        </div>
+                        <div class="how-it-works-icon m-0" style="width: 50px; height: 50px; font-size: 1.5rem; background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
+                            <i class="bi bi-x-octagon-fill"></i>
+                        </div>
+                    </div>
+                    <p class="text-danger small mb-0 fw-semibold opacity-75">Tickets cancelados</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comisión -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm gradient-card" style="border: 1px solid rgba(245, 197, 66, 0.3) !important;">
+                <div class="card-body p-4 position-relative overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="text-theme-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem; letter-spacing: 1px;">Tu Comisión (<%= user.commissionRate || 0 %>%)</h6>
+                            <h2 class="display-6 fw-bold text-warning mb-0" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                                S/ <%= stats.estimatedCommission.toFixed(2) %>
+                            </h2>
+                        </div>
+                        <div class="how-it-works-icon m-0 bg-transparent border-0" style="width: 50px; height: 50px; font-size: 2rem; color: var(--accent-color); box-shadow: none;">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                    <hr class="border-white opacity-25 my-3">
+                    <p class="text-theme-light small fw-medium mb-0">Volumen: <span class="fw-bold">S/ <%= stats.totalSalesAmount.toFixed(2) %></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Ventas -->
+    <div class="card bg-theme-card border-0 shadow-lg overflow-hidden">
+        <div class="card-header bg-transparent border-bottom border-secondary border-opacity-25 p-4">
+            <h4 class="mb-0 fw-bold text-theme-light"><i class="bi bi-list-ul text-warning me-2"></i> Historial de Registros</h4>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 border-0" style="color: var(--text-light);">
+                    <thead style="background: rgba(0,0,0,0.2);">
+                        <tr>
+                            <th class="ps-4 py-3 border-0 text-theme-muted small">Fecha</th>
+                            <th class="py-3 border-0 text-theme-muted small">Sorteo</th>
+                            <th class="py-3 border-0 text-theme-muted small">Cliente</th>
+                            <th class="py-3 border-0 text-theme-muted small text-center">Tickets</th>
+                            <th class="py-3 border-0 text-theme-muted small">Monto</th>
+                            <th class="pe-4 py-3 border-0 text-theme-muted small">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (sales && sales.length > 0) { %>
+                            <% sales.forEach(sale => { %>
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="fw-medium text-theme-light"><%= new Date(sale.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) %></div>
+                                        <div class="small text-theme-muted"><%= new Date(sale.createdAt).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }) %></div>
+                                    </td>
+                                    <td class="py-3 fw-semibold text-theme-light">
+                                        <%= sale.raffleId ? sale.raffleId.title : 'Sorteo Eliminado' %>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="fw-bold text-theme-light d-flex align-items-center">
+                                            <i class="bi bi-person-circle text-secondary me-2"></i> <%= sale.guestName || 'Usuario Web' %>
+                                        </div>
+                                        <div class="small text-theme-muted ms-4"><%= sale.guestPhone || '' %></div>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <span class="badge border border-warning text-warning rounded-circle p-2 fs-6 shadow-sm" style="background: var(--bg-darker); width: 35px; height: 35px; line-height: 1;">
+                                            <%= sale.ticketQty %>
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-success fw-bold fs-6">S/ <%= sale.amount.toFixed(2) %></span>
+                                    </td>
+                                    <td class="pe-4 py-3">
+                                        <% if (sale.status === 'pending' || sale.status === 'reviewing') { %>
+                                            <span class="badge rounded-pill px-3 py-2 fw-medium" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                                <i class="bi bi-clock-history me-1"></i> Pendiente
+                                            </span>
+                                        <% } else if (sale.status === 'approved') { %>
+                                            <span class="badge rounded-pill px-3 py-2 fw-medium" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);">
+                                                <i class="bi bi-check2-circle me-1"></i> Aprobado
+                                            </span>
+                                        <% } else if (sale.status === 'rejected' || sale.status === 'cancelled') { %>
+                                            <div class="d-flex flex-column align-items-start gap-1">
+                                                <span class="badge rounded-pill px-3 py-2 fw-medium" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                                    <i class="bi bi-x-lg me-1"></i> Rechazado
+                                                </span>
+                                                <% if (sale.rejectionReason) { %>
+                                                    <small class="text-danger opacity-75 text-truncate" style="max-width: 150px;" title="<%= sale.rejectionReason %>"><%= sale.rejectionReason %></small>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="py-5 text-center">
+                                    <div class="text-muted py-4">
+                                        <i class="bi bi-inbox display-4 mb-3 d-block opacity-50"></i>
+                                        <h5 class="fw-normal">Aún no has registrado ninguna venta.</h5>
+                                        <a href="/vendor/register-sale" class="btn btn-outline-warning rounded-pill mt-3 px-4">Registrar mi primera venta</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

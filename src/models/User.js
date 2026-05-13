@@ -6,8 +6,11 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  role: { type: String, enum: ['user', 'admin', 'vendor'], default: 'user' },
   status: { type: String, enum: ['active', 'blocked'], default: 'active' },
+  // Vendor Fields
+  vendorCode: { type: String, unique: true, sparse: true },
+  commissionRate: { type: Number, default: 0 },
   // Gamification Fields
   credits: { type: Number, default: 0 },
   lastLoginDate: { type: Date, default: null },

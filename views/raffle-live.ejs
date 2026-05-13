@@ -15,7 +15,7 @@
     border-radius: 1.5rem;
     border: 6px solid #f59e0b;
     box-shadow: 0 15px 40px rgba(245, 158, 11, 0.4);
-    background: #fff;
+    background: var(--bg-darker);
     perspective: 1000px;
     display: none; /* Oculto hasta que el admin inicie */
   }
@@ -24,8 +24,8 @@
   .slot-container::after {
     content: ''; position: absolute; left: 0; right: 0; height: 120px; z-index: 10; pointer-events: none;
   }
-  .slot-container::before { background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); top: 0; }
-  .slot-container::after { background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); bottom: 0; }
+  .slot-container::before { background: linear-gradient(to bottom, var(--bg-darker) 0%, transparent 100%); top: 0; }
+  .slot-container::after { background: linear-gradient(to top, var(--bg-darker) 0%, transparent 100%); bottom: 0; }
   
   .slot-pointer {
     position: absolute; top: 50%; left: 0; right: 0; height: 70px; margin-top: -35px;
@@ -38,7 +38,7 @@
   .slot-strip { position: absolute; top: 0; left: 0; width: 100%; transition: transform 0.1s linear; will-change: transform; }
   .slot-item {
     height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1.1rem; color: #1e1b4b; border-bottom: 1px solid rgba(0,0,0,0.05); transition: filter 0.3s;
+    font-weight: 700; font-size: 1.1rem; color: var(--text-light); border-bottom: 1px solid var(--border-color); transition: filter 0.3s;
   }
   .slot-item .ticket-num { font-size: 0.75rem; color: #db2777; background: rgba(219, 39, 119, 0.1); padding: 1px 8px; border-radius: 10px; margin-top: 2px; }
   .spinning .slot-item { filter: blur(1.5px); }
@@ -95,7 +95,7 @@
         <% } %>
 
         <!-- ESTADO DE LA RULETA -->
-        <div class="card bg-white text-dark shadow-lg rounded-4 p-4 text-center" id="rouletteSection">
+        <div class="card bg-theme-card text-theme-light shadow-lg rounded-4 p-4 text-center" id="rouletteSection">
           
           <div id="waitingState" class="waiting-msg py-5">
             <div style="font-size: 4rem;">⏳</div>
@@ -113,7 +113,7 @@
         </div>
 
         <!-- GANADOR -->
-        <div class="card border-0 shadow-lg p-5 mt-4 winner-card text-center bg-white text-dark" id="winnerCard">
+        <div class="card border-0 shadow-lg p-5 mt-4 winner-card text-center bg-theme-card text-theme-light" id="winnerCard">
           <div class="mb-3" style="font-size: 6rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🏆</div>
           <h2 class="fw-bold mb-1 text-warning">¡Tenemos un Ganador!</h2>
           <p class="text-muted mb-4">El sorteo ha finalizado con éxito.</p>
@@ -123,7 +123,7 @@
             <div class="d-flex justify-content-center gap-2 mb-3">
               <span class="badge bg-primary fs-5 px-3 py-2" id="winnerTicket"></span>
             </div>
-            <h4 class="fw-bold text-dark" id="winnerPrize"></h4>
+            <h4 class="fw-bold text-theme-light" id="winnerPrize"></h4>
           </div>
           
           <a href="/dashboard" class="btn btn-outline-primary rounded-pill px-4">Ir a mi Panel</a>

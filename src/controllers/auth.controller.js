@@ -50,7 +50,14 @@ exports.login = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       const token = generateToken(user._id);
       res.cookie('jwt', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
-      res.redirect('/dashboard');
+      
+      if (user.role === 'admin') {
+        res.redirect('/admin');
+      } else if (user.role === 'vendor') {
+        res.redirect('/vendor/dashboard');
+      } else {
+        res.redirect('/dashboard');
+      }
     } else {
       res.redirect(`/login?error=${encodeURIComponent('Email o contraseña inválida')}`);
     }

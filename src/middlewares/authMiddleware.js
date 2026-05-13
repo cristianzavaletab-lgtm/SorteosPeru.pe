@@ -27,6 +27,14 @@ const admin = (req, res, next) => {
   }
 };
 
+const isVendor = (req, res, next) => {
+  if (req.user && (req.user.role === 'vendor' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(401).send('Not authorized as a vendor');
+  }
+};
+
 const checkUser = async (req, res, next) => {
   let token = req.cookies.jwt;
   
@@ -45,4 +53,4 @@ const checkUser = async (req, res, next) => {
   next();
 };
 
-module.exports = { protect, admin, checkUser };
+module.exports = { protect, admin, isVendor, checkUser };
