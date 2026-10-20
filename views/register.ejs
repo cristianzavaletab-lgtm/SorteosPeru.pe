@@ -38,26 +38,26 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label text-muted small fw-bold">Nombres</label>
-              <input type="text" class="form-control form-control-lg" name="nombres" required placeholder="Juan Carlos">
+              <input type="text" class="form-control form-control-lg" name="nombres" required autocomplete="given-name" placeholder="Juan Carlos">
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label text-muted small fw-bold">Apellidos</label>
-              <input type="text" class="form-control form-control-lg" name="apellidos" required placeholder="Pérez Rodríguez">
+              <input type="text" class="form-control form-control-lg" name="apellidos" required autocomplete="family-name" placeholder="Pérez Rodríguez">
             </div>
             <div class="col-md-12 mb-3">
               <label class="form-label text-muted small fw-bold">WhatsApp (9 dígitos)</label>
-              <input type="tel" class="form-control form-control-lg" name="phone" required pattern="[0-9]{9}" placeholder="999888777" value="<%= typeof phone !== 'undefined' ? phone : '' %>">
+              <input type="tel" class="form-control form-control-lg" name="phone" required autocomplete="tel-national" inputmode="numeric" pattern="[0-9]{9}" placeholder="999888777" value="<%= typeof phone !== 'undefined' ? phone : '' %>">
               <div class="form-text small">Debe ser tu número real para contactarte cuando ganes.</div>
             </div>
             <div class="col-md-12 mb-3">
               <label class="form-label text-muted small fw-bold">Correo Electrónico</label>
-              <input type="email" class="form-control form-control-lg" name="email" required placeholder="tu@correo.com">
+              <input type="email" class="form-control form-control-lg" name="email" required autocomplete="email" placeholder="tu@correo.com">
               <div class="form-text small">Máximo una cuenta por correo.</div>
             </div>
             <div class="col-md-12 mb-4">
               <label class="form-label text-muted small fw-bold">Contraseña (Mínimo 6 caracteres)</label>
               <div class="input-group">
-                <input type="password" class="form-control form-control-lg" name="password" id="passwordInput" required minlength="6" placeholder="Mínimo 6 caracteres">
+                <input type="password" class="form-control form-control-lg" name="password" id="passwordInput" required autocomplete="new-password" minlength="6" placeholder="Mínimo 6 caracteres">
                 <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                   <i class="bi bi-eye-fill text-muted"></i>
                 </button>
