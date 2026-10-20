@@ -1,6 +1,12 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 
-const uri = "mongodb+srv://zavaletacristian77_db_user:KbI0dhgCDjCVbYoR@sorteos.znxecbn.mongodb.net/sorteos_peru?retryWrites=true&w=majority&appName=Sorteos";
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  console.error('Falta la variable MONGODB_URI.');
+  process.exit(1);
+}
 
 mongoose.connect(uri)
   .then(() => {
