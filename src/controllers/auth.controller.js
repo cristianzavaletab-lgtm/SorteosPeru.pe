@@ -10,6 +10,13 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  maxAge: 30 * 24 * 60 * 60 * 1000
+};
+
 // Registro manual con Nombres y Apellidos
 exports.register = async (req, res) => {
   const { nombres, apellidos, name, email, password, phone } = req.body;
@@ -59,7 +66,7 @@ exports.register = async (req, res) => {
     });
 
     const token = generateToken(user._id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.cookie('jwt', token, authCookieOptions);
     res.redirect('/dashboard');
   } catch (error) {
     console.error("ERROR AL REGISTRAR:", error);
@@ -75,7 +82,7 @@ exports.login = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
       const token = generateToken(user._id);
-      res.cookie('jwt', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+      res.cookie('jwt', token, authCookieOptions);
       
       if (user.role === 'admin') {
         res.redirect('/admin');
@@ -99,6 +106,11 @@ exports.logout = (req, res) => {
 
 // Autenticación con Google (usando google-auth-library)
 exports.googleAuth = async (req, res) => {
+  const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+  if (!googleClientId) {
+    return res.status(503).json({ success: false, error: 'El acceso con Google no está configurado.' });
+  }
+
   const idToken = req.body.token || req.body.credential;
   if (!idToken) {
     return res.status(400).json({ success: false, error: 'Token o credencial de Google no recibida' });
@@ -109,7 +121,7 @@ exports.googleAuth = async (req, res) => {
     try {
       const ticket = await googleClient.verifyIdToken({
         idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: googleClientId,
       });
       payload = ticket.getPayload();
     } catch (verifyErr) {
@@ -130,6 +142,10 @@ exports.googleAuth = async (req, res) => {
           });
         }).on('error', reject);
       });
+    }
+
+    if (payload.aud !== googleClientId) {
+      throw new Error('La credencial de Google no corresponde a esta aplicación.');
     }
 
     const { email, sub, picture } = payload;
@@ -182,7 +198,7 @@ exports.googleAuth = async (req, res) => {
     }
 
     const token = generateToken(user._id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.cookie('jwt', token, authCookieOptions);
 
     let redirectUrl = '/dashboard';
     if (user.role === 'admin') redirectUrl = '/admin';
