@@ -104,7 +104,7 @@
 
   <!-- ALERTA SI NO TIENE TELÉFONO -->
   <% if (!user.phone) { %>
-    <div class="alert border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(234, 88, 12, 0.1)); border-left: 6px solid #f59e0b !important;">
+    <div class="d-none" aria-hidden="true">
       <div class="d-flex align-items-center">
         <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.2); font-size: 1.6rem; color: #d97706;">
           <i class="bi bi-whatsapp"></i>
@@ -468,7 +468,26 @@
       </div>
 
       <!-- MÓDULO DE NÚMERO CELULAR / WHATSAPP -->
-      <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" id="modulo-whatsapp" style="border: 1px solid rgba(37, 211, 102, 0.3) !important;">
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-theme-card dashboard-contact-card" id="modulo-whatsapp">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: rgba(37, 211, 102, 0.14); color: #25D366; font-size: 1.25rem;">
+            <i class="bi bi-whatsapp"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h6 class="fw-bold mb-1">WhatsApp de contacto</h6>
+            <p class="small text-muted mb-0"><%= user.phone ? `+51 ${user.phone}` : 'Aún no registraste un número' %></p>
+          </div>
+          <span class="badge rounded-pill <%= user.phone ? 'bg-success' : 'bg-warning text-dark' %>">
+            <%= user.phone ? 'Activo' : 'Pendiente' %>
+          </span>
+        </div>
+        <p class="small text-muted mb-3">Usaremos este número para confirmar tickets y contactarte si ganas.</p>
+        <a href="/perfil#whatsapp" class="btn btn-outline-success rounded-pill fw-bold w-100">
+          <i class="bi bi-pencil-square me-2"></i><%= user.phone ? 'Revisar mi número' : 'Registrar WhatsApp' %>
+        </a>
+      </div>
+
+      <div class="d-none" id="modulo-whatsapp-legacy" aria-hidden="true">
         <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
           <h6 class="fw-bold mb-0 text-theme-light d-flex align-items-center gap-2">
             <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; background: #25D366; font-size: 1.1rem;">
@@ -576,7 +595,7 @@
       </div>
 
       <!-- CTA -->
-      <div class="card border-0 shadow-sm ticket-card overflow-hidden mb-4">
+      <div class="d-none" aria-hidden="true">
         <div class="card-body p-4 text-center">
           <div style="font-size: 2.5rem;">🍀</div>
           <h6 class="fw-bold mt-2">¡No te quedes con las ganas!</h6>

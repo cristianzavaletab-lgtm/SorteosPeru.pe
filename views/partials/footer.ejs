@@ -4,243 +4,60 @@
   <div class="container text-center text-md-start">
     <div class="row align-items-center">
       <div class="col-md-6 mb-3 mb-md-0">
-        <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+        <h5 class="fw-bold text-white mb-2 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
           <img src="/images/logo-conejo.png" alt="Sorteos Perú" style="width: 28px; height: 28px; object-fit: contain;">
           <span>SorteosPeru<span style="color:var(--accent-color)">.</span>pe</span>
         </h5>
-        <p class="text-secondary small mb-1">Participa en sorteos transparentes y gana premios reales. Pago seguro por Yape y Plin.</p>
+        <p class="text-secondary small mb-1">Sorteos transparentes, pagos por Yape o Plin y premios reales.</p>
         <p class="text-secondary small mb-0">
-          <i class="bi bi-whatsapp text-success me-1"></i> WhatsApp Oficial: 
-          <a href="https://wa.me/51918762620" target="_blank" class="text-light text-decoration-none fw-bold">918 762 620</a>
+          <i class="bi bi-whatsapp text-success me-1"></i> WhatsApp oficial:
+          <a href="https://wa.me/51918762620" target="_blank" rel="noopener" class="text-light text-decoration-none fw-bold">918 762 620</a>
         </p>
       </div>
       <div class="col-md-6 text-md-end">
-        <p class="text-secondary small mb-1">
-          &copy; <%= new Date().getFullYear() %> SorteosPeru.pe. Todos los derechos reservados.
-        </p>
-        <p class="text-muted small mb-0" style="font-size: 0.75rem;">
-          Sitio Oficial: <a href="https://sorteosperu-pe.onrender.com" class="text-muted text-decoration-none">sorteosperu-pe.onrender.com</a>
-        </p>
+        <p class="text-secondary small mb-1">&copy; <%= new Date().getFullYear() %> SorteosPeru.pe.</p>
+        <p class="text-muted small mb-0" style="font-size: 0.75rem;">Plataforma oficial de sorteos.</p>
       </div>
     </div>
   </div>
 </footer>
 
-<!-- Bootstrap 5 JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Global Realtime Updates -->
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const globalSocket = io();
-  
+  window.appSocket = typeof io === 'function' ? io() : null;
+
   <% if (typeof user !== 'undefined' && user) { %>
     const myUserId = "<%= user._id %>";
     const userRole = "<%= user.role %>";
 
-    globalSocket.on('user_update', (data) => {
-      if (data.userId === myUserId) {
-        showToastNotification(data.message, 'success');
-      }
-    });
-
-    if (userRole === 'admin') {
-      globalSocket.on('admin_update', (data) => {
-        showToastNotification('🔔 Admin: ' + data.message, 'info');
+    if (window.appSocket) {
+      window.appSocket.on('user_update', (data) => {
+        if (data.userId === myUserId) showToastNotification(data.message, 'success');
       });
+
+      if (userRole === 'admin') {
+        window.appSocket.on('admin_update', (data) => showToastNotification(`Admin: ${data.message}`, 'info'));
+      }
     }
 
     function showToastNotification(message, type) {
-      const bgClass = type === 'success' ? 'bg-success' : 'bg-primary';
-      const toastHtml = `
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
-          <div class="toast align-items-center text-white ${bgClass} border-0 show" role="alert" data-bs-autohide="true" data-bs-delay="4000">
-            <div class="d-flex">
-              <div class="toast-body fw-bold">
-                ${message} <br><small>Actualizando vista...</small>
-              </div>
-              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
+      const backgroundClass = type === 'success' ? 'bg-success' : 'bg-primary';
+      const toastWrapper = document.createElement('div');
+      toastWrapper.className = 'position-fixed bottom-0 end-0 p-3';
+      toastWrapper.style.zIndex = '1080';
+      toastWrapper.innerHTML = `
+        <div class="toast align-items-center text-white ${backgroundClass} border-0 show" role="status">
+          <div class="d-flex">
+            <div class="toast-body fw-semibold"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
           </div>
-        </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', toastHtml);
-      setTimeout(() => {
-        window.location.reload();
-      }, 2500);
+        </div>`;
+      toastWrapper.querySelector('.toast-body').textContent = message;
+      document.body.appendChild(toastWrapper);
+      setTimeout(() => toastWrapper.remove(), 4500);
     }
   <% } %>
-<!-- Script oficial Google Model Viewer para 3D GLB -->
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
-<!-- Mascota 3D Flotante Sorteos Perú -->
-<div id="mascot3dWrapper" class="mascot-3d-wrapper">
-  <!-- Globito de saludo interactivo -->
-  <div id="mascotBubble" class="mascot-speech-bubble shadow-sm">
-    <span class="small fw-bold">¡Hola! 🍀 ¡La suerte está contigo!</span>
-  </div>
-
-  <!-- Botón minimizar / cerrar -->
-  <button type="button" class="mascot-close-btn shadow-sm" onclick="toggleMascot3D()" title="Ocultar / Mostrar Mascota" aria-label="Minimizar mascota">
-    <i class="bi bi-x-lg" id="mascotToggleIcon"></i>
-  </button>
-
-  <!-- Visor 3D Modelo GLB -->
-  <model-viewer id="mascotViewer" 
-                src="/models/Mascota_Yape_3D.glb" 
-                alt="Mascota 3D Sorteos Perú" 
-                auto-rotate 
-                rotation-per-second="28deg"
-                camera-controls 
-                touch-action="pan-y"
-                interaction-prompt="none"
-                shadow-intensity="1.2" 
-                shadow-softness="0.9"
-                exposure="1.08"
-                camera-orbit="0deg 75deg 105%"
-                style="width: 135px; height: 155px; background: transparent; outline: none; cursor: grab;">
-  </model-viewer>
-</div>
-
-<!-- Botón para restaurar la mascota cuando esté minimizada -->
-<button id="mascotRestoreBtn" class="mascot-restore-btn shadow d-none" onclick="toggleMascot3D()" title="Ver Mascota 3D">
-  <img src="/images/logo-conejo.png" alt="Mascota 3D" style="width: 28px; height: 28px; object-fit: contain;">
-  <span class="badge rounded-pill bg-warning text-dark px-2 ms-1 fw-bold" style="font-size: 0.7rem;">3D</span>
-</button>
-
-<style>
-  @keyframes floatMascotAnimation {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-7px); }
-  }
-
-  .mascot-3d-wrapper {
-    position: fixed;
-    bottom: 80px;
-    right: 18px;
-    z-index: 9990;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: floatMascotAnimation 4s ease-in-out infinite;
-    pointer-events: auto;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-
-  .mascot-speech-bubble {
-    background: var(--card-bg-solid, #1C1331);
-    color: var(--text-light, #FFFFFF);
-    border: 1px solid var(--card-border, rgba(251, 191, 36, 0.3));
-    border-radius: 12px;
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    opacity: 0.95;
-    pointer-events: none;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  }
-
-  .mascot-speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px 6px 0;
-    border-style: solid;
-    border-color: var(--card-bg-solid, #1C1331) transparent;
-    display: block;
-    width: 0;
-  }
-
-  .mascot-close-btn {
-    position: absolute;
-    top: 24px;
-    right: 6px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.45);
-    color: #FFFFFF;
-    font-size: 0.65rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s ease;
-  }
-
-  .mascot-close-btn:hover {
-    background: #EF4444;
-    transform: scale(1.15);
-  }
-
-  .mascot-restore-btn {
-    position: fixed;
-    bottom: 80px;
-    right: 18px;
-    z-index: 9990;
-    background: var(--card-bg-solid, #1C1331);
-    border: 2px solid var(--card-border, #FBBF24);
-    border-radius: 9999px;
-    padding: 6px 12px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .mascot-restore-btn:hover {
-    transform: scale(1.06);
-    border-color: var(--accent-color, #FBBF24);
-  }
-
-  @media (max-width: 576px) {
-    .mascot-3d-wrapper {
-      bottom: 74px;
-      right: 10px;
-    }
-    model-viewer#mascotViewer {
-      width: 105px !important;
-      height: 125px !important;
-    }
-    .mascot-speech-bubble {
-      font-size: 0.68rem;
-      padding: 4px 8px;
-    }
-  }
-</style>
-
-<script>
-  function toggleMascot3D() {
-    const wrapper = document.getElementById('mascot3dWrapper');
-    const restoreBtn = document.getElementById('mascotRestoreBtn');
-    if (!wrapper || !restoreBtn) return;
-
-    if (wrapper.classList.contains('d-none')) {
-      wrapper.classList.remove('d-none');
-      restoreBtn.classList.add('d-none');
-      localStorage.setItem('mascot3d_minimized', 'false');
-    } else {
-      wrapper.classList.add('d-none');
-      restoreBtn.classList.remove('d-none');
-      localStorage.setItem('mascot3d_minimized', 'true');
-    }
-  }
-
-  // Recordar preferencia del usuario
-  if (localStorage.getItem('mascot3d_minimized') === 'true') {
-    const wrapper = document.getElementById('mascot3dWrapper');
-    const restoreBtn = document.getElementById('mascotRestoreBtn');
-    if (wrapper && restoreBtn) {
-      wrapper.classList.add('d-none');
-      restoreBtn.classList.remove('d-none');
-    }
-  }
 </script>
 </body>
 </html>

@@ -218,6 +218,11 @@ a:hover {
   z-index: 1030;
 }
 
+.promo-bar {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  font-size: clamp(0.78rem, 2.5vw, 0.88rem);
+}
+
 .brand-text {
   font-weight: 900;
   font-size: 1.65rem;
@@ -771,22 +776,113 @@ footer {
    Responsive Design (Mobile, Tablet, Desktop)
    ============================================= */
 @media (max-width: 991.98px) {
+  .navbar {
+    padding: 0.65rem 0;
+  }
+
+  .brand-text {
+    font-size: 1.3rem;
+  }
+
   .navbar-collapse {
     background: var(--bg-elevated);
     border: 1px solid var(--card-border);
-    border-radius: 1.25rem;
-    padding: 1.25rem;
-    margin-top: 0.85rem;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    margin-top: 0.65rem;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    max-height: calc(100dvh - 132px);
+    overflow-y: auto;
   }
 
-  .navbar-nav .nav-link {
-    padding: 0.75rem 1rem !important;
-    margin-bottom: 0.25rem;
+  .primary-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .primary-nav .nav-link {
+    min-height: 48px;
+    padding: 0.65rem 0.75rem !important;
+    margin: 0;
+    background: rgba(124, 58, 237, 0.06);
+    border: 1px solid var(--card-border);
+    line-height: 1.2;
+  }
+
+  .user-nav {
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 0.5rem;
+    border-top: 1px solid var(--card-border);
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+  }
+
+  .user-nav .nav-item {
+    margin: 0 !important;
+  }
+
+  .notification-dropdown {
+    position: fixed !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    top: 132px !important;
+    width: auto !important;
+    max-height: calc(100dvh - 160px);
+    overflow-y: auto;
+    transform: none !important;
   }
 }
 
 @media (max-width: 767.98px) {
+  .profile-page,
+  .container.py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .profile-hero {
+    padding: 1.25rem !important;
+  }
+
+  .profile-hero .gap-4 {
+    gap: 0.9rem !important;
+  }
+
+  .profile-hero .rounded-circle {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.7rem !important;
+  }
+
+  .profile-hero h3 {
+    font-size: 1.25rem;
+  }
+
+  .profile-page .card,
+  .dashboard-contact-card {
+    padding: 1.1rem !important;
+  }
+
+  .profile-page .input-group-lg {
+    flex-wrap: wrap;
+  }
+
+  .profile-page .input-group-lg > .input-group-text {
+    width: 82px;
+  }
+
+  .profile-page .input-group-lg > .form-control {
+    width: calc(100% - 82px);
+  }
+
+  .profile-page .input-group-lg > .btn {
+    width: 100%;
+    border-radius: 0 0 0.75rem 0.75rem !important;
+    margin-left: 0 !important;
+  }
+
   .hero-section {
     padding: 3.5rem 0 2.25rem !important;
   }
@@ -829,17 +925,36 @@ footer {
 }
 
 @media (max-width: 575.98px) {
+  .promo-bar {
+    font-size: 0.75rem;
+    padding-block: 0.42rem !important;
+  }
+
+  .promo-bar .container {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar-brand img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
   .hero-title {
     font-size: 2rem !important;
   }
 
-  .btn {
+  .mobile-stack-actions .btn {
     width: 100%;
-    margin-bottom: 0.5rem;
   }
 
-  .d-flex.gap-3.flex-wrap .btn {
-    width: 100%;
+  .input-group > .btn,
+  .navbar .btn,
+  .dropdown .btn,
+  .btn-close {
+    width: auto;
+    margin-bottom: 0;
   }
 
   .countdown-box {
@@ -1020,4 +1135,3 @@ footer {
   color: var(--text-light) !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
-
