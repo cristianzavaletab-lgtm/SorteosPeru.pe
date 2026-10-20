@@ -8,6 +8,7 @@ const exceljs = require('exceljs');
 const pushController = require('./push.controller');
 const { generateTicketNumber } = require('../utils/generateTicket');
 const { drawRandomWinner } = require('../utils/drawWinner');
+const mailer = require('../utils/mailer');
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -57,9 +58,14 @@ exports.getDashboard = async (req, res) => {
 
 exports.getPayments = async (req, res) => {
   try {
-    const payments = await Payment.find({ status: 'pending' }).populate('userId').populate('raffleId');
+    const payments = await Payment.find({ status: 'pending' })
+      .populate('userId', 'name phone email')
+      .populate('vendorId', 'name phone email vendorCode')
+      .populate('raffleId', 'title ticketPrice')
+      .sort({ createdAt: -1 });
     res.render('admin/payments', { payments });
   } catch (error) {
+    console.error('Error al obtener pagos:', error);
     res.status(500).send('Error al obtener pagos');
   }
 };
@@ -141,10 +147,16 @@ exports.approvePayment = async (req, res) => {
       link: '/vendor/dashboard'
     });
 
-    // Redirigir a WhatsApp con mensaje de aprobación
     const phone = payment.userId ? payment.userId.phone : payment.guestPhone;
     const name = payment.userId ? payment.userId.name : payment.guestName;
-    
+
+    // Enviar confirmación automática por correo electrónico
+    const userEmail = payment.userId ? payment.userId.email : null;
+    if (userEmail) {
+      mailer.sendPaymentApprovedEmail(userEmail, name, payment.raffleId, ticketNumbers, payment.amount)
+        .catch(err => console.error('Error enviando correo de confirmación de tickets:', err));
+    }
+
     if (phone) {
       const cleanPhone = phone.replace(/\s/g, '');
       const phoneFormatted = cleanPhone.startsWith('51') ? cleanPhone : '51' + cleanPhone;
@@ -289,6 +301,21 @@ exports.createRaffle = async (req, res) => {
       link: '/sorteos/' + raffle._id
     });
 
+    if (raffle.status === 'active') {
+      (async () => {
+        try {
+          const users = await User.find({ role: 'user', status: 'active' }).select('email name');
+          for (const u of users) {
+            if (u.email) {
+              await mailer.sendNewRaffleEmail(u.email, u.name, raffle).catch(() => {});
+            }
+          }
+        } catch (e) {
+          console.error('Error enviando emails de nuevo sorteo:', e);
+        }
+      })();
+    }
+
     res.redirect('/admin/sorteos');
   } catch (error) {
     console.error(error);
@@ -321,6 +348,19 @@ exports.updateRaffle = async (req, res) => {
         type: 'system',
         link: '/sorteos/' + raffle._id
       });
+
+      (async () => {
+        try {
+          const users = await User.find({ role: 'user', status: 'active' }).select('email name');
+          for (const u of users) {
+            if (u.email) {
+              await mailer.sendNewRaffleEmail(u.email, u.name, raffle).catch(() => {});
+            }
+          }
+        } catch (e) {
+          console.error('Error enviando emails de sorteo activado:', e);
+        }
+      })();
     }
     
     if (req.file) {
@@ -337,9 +377,21 @@ exports.updateRaffle = async (req, res) => {
 exports.getDrawPage = async (req, res) => {
   try {
     const raffle = await Raffle.findById(req.params.id);
+    if (!raffle) return res.status(404).send('Sorteo no encontrado');
+
     const tickets = await Ticket.find({ raffleId: raffle._id, status: 'valid' }).populate('userId');
-    res.render('admin/draw', { raffle, tickets });
+
+    // Buscar ganador activo si ya fue sorteado
+    const activeWinner = await Winner.findOne({ 
+      raffleId: raffle._id, 
+      deliveryStatus: { $ne: 'disqualified' } 
+    }).populate('userId').populate('ticketId').sort({ createdAt: -1 });
+
+    const attempts = raffle.drawAttempts || [];
+
+    res.render('admin/draw', { raffle, tickets, activeWinner, attempts });
   } catch (error) {
+    console.error('Error al cargar página de sorteo:', error);
     res.status(500).send('Error al cargar página de sorteo');
   }
 };
@@ -347,32 +399,37 @@ exports.getDrawPage = async (req, res) => {
 exports.executeDraw = async (req, res) => {
   try {
     const raffle = await Raffle.findById(req.params.id);
-    if (raffle.status !== 'active') return res.status(400).json({ error: 'El sorteo no está activo' });
+    if (!raffle) return res.status(404).json({ error: 'Sorteo no encontrado' });
+    if (raffle.status !== 'active') {
+      return res.status(400).json({ error: 'El sorteo no está activo. Si deseas sortear de nuevo, primero anula el ganador anterior indicando el motivo.' });
+    }
 
     const winningTicket = await drawRandomWinner(raffle._id);
     
     winningTicket.status = 'winner';
     await winningTicket.save();
 
-    raffle.status = 'completed';
-    raffle.winnerTicketId = winningTicket._id;
-    await raffle.save();
+    const attemptNumber = (raffle.drawAttempts?.length || 0) + 1;
+
+    let winnerName = winningTicket.guestName || 'Usuario Desconocido';
+    let winnerPhone = winningTicket.guestPhone || 'Sin número';
+    let winnerEmail = '';
 
     let winnerData = {
       raffleId: raffle._id,
       ticketId: winningTicket._id,
-      prizeValue: raffle.prizeValue
+      prizeValue: raffle.prizeValue,
+      attemptNumber,
+      deliveryStatus: 'pending'
     };
-
-    let winnerName = winningTicket.guestName || 'Usuario Desconocido';
-    let winnerPhone = winningTicket.guestPhone || 'Sin número';
 
     if (winningTicket.userId) {
       const winnerUser = await User.findById(winningTicket.userId);
       winnerData.userId = winningTicket.userId;
       if (winnerUser) {
         winnerName = winnerUser.name;
-        winnerPhone = winnerUser.phone;
+        winnerPhone = winnerUser.phone || 'Sin número';
+        winnerEmail = winnerUser.email || '';
       }
     } else {
       winnerData.guestName = winningTicket.guestName;
@@ -381,7 +438,23 @@ exports.executeDraw = async (req, res) => {
 
     const winner = await Winner.create(winnerData);
 
-    // Notificar al Ganador (si es usuario registrado)
+    // Auditoría y respaldo de intentos
+    raffle.status = 'completed';
+    raffle.winnerTicketId = winningTicket._id;
+    if (!raffle.drawAttempts) raffle.drawAttempts = [];
+    raffle.drawAttempts.push({
+      attemptNumber,
+      ticketId: winningTicket._id,
+      ticketNumber: winningTicket.ticketNumber,
+      winnerName,
+      winnerPhone,
+      winnerEmail,
+      drawnAt: new Date(),
+      status: 'valid'
+    });
+    await raffle.save();
+
+    // Notificar al Ganador si es usuario registrado
     if (winningTicket.userId) {
       await sendNotification(req.app, {
         recipientId: winningTicket.userId,
@@ -393,17 +466,114 @@ exports.executeDraw = async (req, res) => {
       });
     }
 
-    // Devolver JSON para la ruleta
+    // Enviar correo electrónico de felicitación al ganador
+    if (winnerEmail) {
+      mailer.sendWinnerEmail(winnerEmail, winnerName, raffle, winningTicket.ticketNumber)
+        .catch(err => console.error('Error enviando correo a ganador:', err));
+    }
+
+    // Generar link directo de WhatsApp para llamar/escribir al ganador
+    let whatsappUrl = '';
+    if (winnerPhone && winnerPhone !== 'Sin número') {
+      const cleanPhone = winnerPhone.replace(/\D/g, '');
+      const phoneFormatted = cleanPhone.startsWith('51') ? cleanPhone : '51' + cleanPhone;
+      const message = encodeURIComponent(
+        `¡Hola ${winnerName}! 🎉 Te felicitamos de parte de SorteosPeru.pe.\n\n` +
+        `¡Has salido GANADOR en el sorteo "${raffle.title}"! 🏆\n` +
+        `🎫 Ticket Ganador: #${winningTicket.ticketNumber}\n` +
+        `💰 Premio: S/${raffle.prizeValue.toFixed(2)}\n\n` +
+        `Por favor confírmanos este mensaje para coordinar la entrega oficial de tu premio. ¡Felicidades!`
+      );
+      whatsappUrl = `https://wa.me/${phoneFormatted}?text=${message}`;
+    }
+
+    const remainingTickets = await Ticket.countDocuments({ raffleId: raffle._id, status: 'valid' });
+
+    // Devolver JSON completo para la ruleta
     res.json({
       success: true,
       winner: {
+        id: winner._id,
+        ticketId: winningTicket._id,
         name: winnerName,
         ticketNumber: winningTicket.ticketNumber,
-        prize: raffle.prizeValue
+        phone: winnerPhone,
+        email: winnerEmail,
+        prize: raffle.prizeValue,
+        attemptNumber,
+        whatsappUrl,
+        remainingTickets
       }
     });
   } catch (error) {
+    console.error('Error al ejecutar sorteo:', error);
     res.status(500).json({ error: error.message || 'Error al ejecutar sorteo' });
+  }
+};
+
+exports.disqualifyAndRedraw = async (req, res) => {
+  try {
+    const raffle = await Raffle.findById(req.params.id);
+    if (!raffle) return res.status(404).json({ error: 'Sorteo no encontrado' });
+
+    const reason = (req.body.reason || '').trim();
+    if (!reason) {
+      return res.status(400).json({ error: 'Debes indicar un motivo de anulación' });
+    }
+
+    // Invalidar el ticket ganador actual
+    if (raffle.winnerTicketId) {
+      const winningTicket = await Ticket.findById(raffle.winnerTicketId);
+      if (winningTicket) {
+        winningTicket.status = 'disqualified';
+        await winningTicket.save();
+      }
+    }
+
+    // Descalificar ganador en Winner
+    await Winner.updateMany(
+      { raffleId: raffle._id, deliveryStatus: { $ne: 'delivered' } },
+      {
+        deliveryStatus: 'disqualified',
+        disqualifiedReason: reason,
+        disqualifiedAt: new Date()
+      }
+    );
+
+    // Actualizar registro en raffle.drawAttempts
+    if (raffle.drawAttempts && raffle.drawAttempts.length > 0) {
+      const lastAttempt = raffle.drawAttempts[raffle.drawAttempts.length - 1];
+      lastAttempt.status = 'disqualified';
+      lastAttempt.disqualifiedReason = reason;
+      lastAttempt.disqualifiedAt = new Date();
+    }
+
+    // Reactivar sorteo y limpiar ganador
+    raffle.status = 'active';
+    raffle.winnerTicketId = null;
+    await raffle.save();
+
+    // Notificar en tiempo real por Socket.IO
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('raffle_draw_reset', { 
+        raffleId: raffle._id, 
+        reason,
+        message: `El ganador anterior fue anulado (${reason}). Se reactiva el sorteo.` 
+      });
+    }
+
+    const remainingTickets = await Ticket.find({ raffleId: raffle._id, status: 'valid' }).populate('userId');
+
+    res.json({
+      success: true,
+      message: 'Ganador anulado y sorteo reactivado correctamente. Todos los demás tickets válidos siguen intactos.',
+      remainingTicketsCount: remainingTickets.length,
+      attempts: raffle.drawAttempts
+    });
+  } catch (error) {
+    console.error('Error al anular ganador:', error);
+    res.status(500).json({ error: error.message || 'Error al anular ganador' });
   }
 };
 

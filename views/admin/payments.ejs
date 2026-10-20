@@ -27,18 +27,63 @@
                 <tr>
                   <td class="px-4 py-3 align-middle"><%= payment.createdAt.toLocaleDateString() %></td>
                   <td class="py-3 align-middle">
-                    <% if (payment.userId) { %>
-                      <div class="fw-bold"><%= payment.userId.name %></div>
-                      <div class="small text-muted"><%= payment.userId.phone %></div>
-                    <% } else if (payment.guestName) { %>
-                      <div class="fw-bold"><%= payment.guestName %> <span class="badge bg-secondary ms-1">Invitado</span></div>
-                      <div class="small text-muted"><%= payment.guestPhone %></div>
+                    <% 
+                      const buyerName = payment.userId ? payment.userId.name : (payment.guestName || 'Invitado');
+                      const buyerPhone = payment.userId ? (payment.userId.phone || '') : (payment.guestPhone || '');
+                      let buyerWaUrl = '';
+                      if (buyerPhone) {
+                        const cleanP = buyerPhone.replace(/\D/g, '');
+                        const pF = cleanP.startsWith('51') ? cleanP : '51' + cleanP;
+                        const msg = encodeURIComponent(`Hola ${buyerName}, te contactamos de SorteosPeru.pe sobre tu compra para el sorteo "${payment.raffleId ? payment.raffleId.title : ''}".`);
+                        buyerWaUrl = `https://wa.me/${pF}?text=${msg}`;
+                      }
+                    %>
+                    <div class="fw-bold text-theme-light d-flex align-items-center">
+                      <%= buyerName %>
+                      <% if (!payment.userId) { %>
+                        <span class="badge bg-secondary ms-1" style="font-size: 0.7rem;">Invitado</span>
+                      <% } %>
+                    </div>
+
+                    <% if (payment.userId && payment.userId.email) { %>
+                      <div class="small text-muted font-monospace" style="font-size: 0.75rem;">
+                        <i class="bi bi-envelope-check text-success me-1" title="Confirmación automática por correo activa"></i><%= payment.userId.email %>
+                      </div>
+                    <% } %>
+
+                    <% if (buyerPhone) { %>
+                      <div class="mt-1 d-flex align-items-center gap-2">
+                        <span class="small text-muted font-monospace"><%= buyerPhone %></span>
+                        <a href="<%= buyerWaUrl %>" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 0.75rem;" title="Chatear con el comprador">
+                          <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                        </a>
+                      </div>
                     <% } else { %>
-                      <div class="fw-bold">N/A</div>
+                      <div class="small text-muted">Sin teléfono</div>
                     <% } %>
                     
                     <% if (payment.vendorId) { %>
-                      <div class="mt-1 small"><span class="badge bg-dark"><i class="bi bi-person-badge me-1"></i>Vendedor</span></div>
+                      <div class="mt-2 p-2 rounded-2" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.25);">
+                        <div class="small fw-bold text-primary">
+                          <i class="bi bi-person-badge-fill me-1"></i>Vendedor: <%= payment.vendorId.name %>
+                        </div>
+                        <div class="small text-muted font-monospace">Código: <%= payment.vendorId.vendorCode || 'N/A' %></div>
+                        <% if (payment.vendorId.phone) { %>
+                          <% 
+                            const vPhone = payment.vendorId.phone.replace(/\D/g, '');
+                            const vPhoneF = vPhone.startsWith('51') ? vPhone : '51' + vPhone;
+                          %>
+                          <a href="https://wa.me/<%= vPhoneF %>" target="_blank" class="small text-success text-decoration-none d-inline-block mt-1">
+                            <i class="bi bi-whatsapp me-1"></i><%= payment.vendorId.phone %>
+                          </a>
+                        <% } %>
+                      </div>
+                    <% } else { %>
+                      <div class="mt-1">
+                        <span class="badge bg-secondary bg-opacity-25 text-theme-muted border border-secondary border-opacity-25" style="font-size: 0.7rem;">
+                          <i class="bi bi-globe me-1"></i>Venta Web Directa
+                        </span>
+                      </div>
                     <% } %>
                   </td>
                   <td class="py-3 align-middle"><%= payment.raffleId ? payment.raffleId.title : 'Sorteo Eliminado' %></td>
@@ -69,10 +114,25 @@
                     <% } %>
                   </td>
                   <td class="py-3 align-middle">
-                    <% if (payment.receiptImage) { %>
-                      <a href="/uploads/<%= payment.receiptImage %>" target="_blank" class="btn btn-sm btn-outline-primary">Ver Imagen</a>
+                    <% 
+                      let cleanReceiptUrl = '';
+                      if (payment.receiptImage) {
+                        const raw = payment.receiptImage.replace(/\\/g, '/');
+                        const filename = raw.split('/').filter(Boolean).pop();
+                        cleanReceiptUrl = filename ? '/uploads/' + filename : '';
+                      }
+                    %>
+                    <% if (cleanReceiptUrl) { %>
+                      <div class="d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" onclick="previewReceipt('<%= cleanReceiptUrl %>', '<%= buyerName %>', 'S/<%= payment.amount ? payment.amount.toFixed(2) : '0.00' %>', '<%= (payment.paymentMethod || '').toUpperCase() %>', '<%= payment._id %>')">
+                          <i class="bi bi-eye me-1"></i> Comprobante
+                        </button>
+                        <a href="<%= cleanReceiptUrl %>" target="_blank" class="btn btn-sm btn-link text-muted p-1" title="Abrir en pestaña nueva">
+                          <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                      </div>
                     <% } else if (payment.paymentDestination === 'vendor') { %>
-                      <span class="text-warning small"><i class="bi bi-exclamation-triangle me-1"></i>Pendiente rendición</span>
+                      <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Rendición Vendedor</span>
                     <% } else { %>
                       <span class="text-muted small">Sin imagen</span>
                     <% } %>
@@ -80,10 +140,10 @@
                   <td class="px-4 py-3 align-middle text-end">
                     <div class="d-flex justify-content-end gap-2">
                       <form action="/admin/pagos/<%= payment._id %>/aprobar" method="POST" class="m-0">
-                        <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Aprobar</button>
+                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3"><i class="bi bi-check-lg me-1"></i> Aprobar</button>
                       </form>
                       <form action="/admin/pagos/<%= payment._id %>/rechazar" method="POST" class="m-0">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas rechazar este pago?')"><i class="bi bi-x-lg"></i> Rechazar</button>
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3" onclick="return confirm('¿Seguro que deseas rechazar este pago?')"><i class="bi bi-x-lg me-1"></i> Rechazar</button>
                       </form>
                     </div>
                   </td>
@@ -100,5 +160,51 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Vista Previa de Comprobante -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="background: var(--card-bg-solid, #1C1331); color: var(--text-light, #fff);">
+      <div class="modal-header border-bottom border-secondary border-opacity-25 px-4 py-3">
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="receiptModalTitle">Comprobante de Pago</h5>
+          <small class="text-muted" id="receiptModalSubtitle"></small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-4 bg-black bg-opacity-25">
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 380px;">
+          <img id="receiptModalImg" src="" alt="Comprobante" class="img-fluid rounded-3 shadow" style="max-height: 520px; object-fit: contain; cursor: zoom-in;" onclick="this.style.maxHeight = this.style.maxHeight === 'none' ? '520px' : 'none';">
+        </div>
+      </div>
+      <div class="modal-footer border-top border-secondary border-opacity-25 px-4 py-3 d-flex justify-content-between">
+        <a id="receiptModalDownload" href="#" target="_blank" class="btn btn-outline-secondary rounded-pill btn-sm">
+          <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en grande
+        </a>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-secondary rounded-pill btn-sm" data-bs-dismiss="modal">Cerrar</button>
+          <form id="receiptModalApproveForm" method="POST" class="m-0">
+            <button type="submit" class="btn btn-success rounded-pill btn-sm fw-bold">
+              <i class="bi bi-check-lg me-1"></i> Aprobar Pago
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function previewReceipt(url, name, amount, method, paymentId) {
+    document.getElementById('receiptModalImg').src = url;
+    document.getElementById('receiptModalDownload').href = url;
+    document.getElementById('receiptModalTitle').innerText = 'Comprobante de ' + name;
+    document.getElementById('receiptModalSubtitle').innerText = 'Monto: ' + amount + ' | Método: ' + method;
+    document.getElementById('receiptModalApproveForm').action = '/admin/pagos/' + paymentId + '/aprobar';
+    
+    const modal = new bootstrap.Modal(document.getElementById('receiptModal'));
+    modal.show();
+  }
+</script>
 
 <%- include('../partials/footer') %>

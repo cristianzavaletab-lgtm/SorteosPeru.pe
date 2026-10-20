@@ -52,7 +52,21 @@
                 </td>
                 <td>
                   <div class="small fw-semibold"><%= user.email %></div>
-                  <div class="text-muted small"><%= user.phone %></div>
+                  <% if (user.phone) { %>
+                    <% 
+                      const uCleanP = user.phone.replace(/\D/g, '');
+                      const uPhoneF = uCleanP.startsWith('51') ? uCleanP : '51' + uCleanP;
+                      const uWaMsg = encodeURIComponent(`¡Hola ${user.name}! Te contactamos de SorteosPeru.pe.`);
+                    %>
+                    <div class="d-flex align-items-center gap-1 mt-1">
+                      <span class="text-muted small font-monospace"><%= user.phone %></span>
+                      <a href="https://wa.me/<%= uPhoneF %>?text=<%= uWaMsg %>" target="_blank" class="badge bg-success text-decoration-none py-1 px-2 rounded-pill" title="Escribir por WhatsApp">
+                        <i class="bi bi-whatsapp me-1"></i>Chat
+                      </a>
+                    </div>
+                  <% } else { %>
+                    <div class="text-muted small opacity-50"><i class="bi bi-dash-circle me-1"></i>Sin celular</div>
+                  <% } %>
                 </td>
                 <td class="text-center">
                   <span class="badge rounded-pill bg-<%= user.ticketCount > 0 ? 'primary' : 'secondary' %>">

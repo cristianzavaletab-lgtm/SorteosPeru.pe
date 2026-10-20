@@ -40,15 +40,30 @@
             
             <!-- Info del ganador -->
             <div class="flex-grow-1">
+              <%
+                const wName = winner.userId ? winner.userId.name : (winner.guestName || 'Invitado');
+                const wPhone = winner.userId ? (winner.userId.phone || '') : (winner.guestPhone || '');
+                const wEmail = winner.userId ? (winner.userId.email || '') : '';
+              %>
               <div class="d-flex justify-content-between align-items-start flex-wrap">
                 <div>
-                  <h5 class="fw-bold mb-1 text-theme-light"><%= winner.userId ? winner.userId.name : 'Usuario eliminado' %></h5>
+                  <h5 class="fw-bold mb-1 text-theme-light">
+                    <%= wName %>
+                    <% if (!winner.userId) { %>
+                      <span class="badge bg-secondary ms-1" style="font-size: 0.7rem;">Invitado</span>
+                    <% } %>
+                    <% if (winner.attemptNumber && winner.attemptNumber > 1) { %>
+                      <span class="badge bg-info text-dark ms-1" style="font-size: 0.7rem;">Intento #<%= winner.attemptNumber %></span>
+                    <% } %>
+                  </h5>
                   <p class="text-theme-muted small mb-1">
                     <i class="bi bi-telephone-fill text-primary me-1"></i> 
-                    <%= winner.userId ? winner.userId.phone : 'N/A' %>
-                    <span class="mx-2">|</span>
-                    <i class="bi bi-envelope-fill text-primary me-1"></i>
-                    <%= winner.userId ? winner.userId.email : 'N/A' %>
+                    <%= wPhone || 'Sin teléfono' %>
+                    <% if (wEmail) { %>
+                      <span class="mx-2">|</span>
+                      <i class="bi bi-envelope-fill text-primary me-1"></i>
+                      <%= wEmail %>
+                    <% } %>
                   </p>
                   <p class="small mb-0">
                     <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 me-2"><i class="bi bi-gift me-1"></i> <%= winner.raffleId ? winner.raffleId.title : 'Sorteo eliminado' %></span>
@@ -61,6 +76,13 @@
                   
                   <% if (winner.deliveryStatus === 'delivered') { %>
                     <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Entregado</span>
+                  <% } else if (winner.deliveryStatus === 'disqualified') { %>
+                    <span class="badge bg-danger px-3 py-2" title="<%= winner.disqualifiedReason || '' %>">
+                      <i class="bi bi-x-circle-fill me-1"></i> Anulado / Descalificado
+                    </span>
+                    <% if (winner.disqualifiedReason) { %>
+                      <div class="small text-danger mt-1 text-end" style="max-width: 200px;"><%= winner.disqualifiedReason %></div>
+                    <% } %>
                   <% } else { %>
                     <div class="d-flex gap-2 justify-content-end">
                       <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-clock-fill me-1"></i> Pendiente</span>
@@ -72,16 +94,16 @@
                     </div>
                   <% } %>
 
-                  <!-- Botón WhatsApp -->
-                  <% if (winner.userId && winner.userId.phone) { %>
+                  <!-- Botón WhatsApp si tiene teléfono y no está descalificado -->
+                  <% if (wPhone && winner.deliveryStatus !== 'disqualified') { %>
                     <% 
-                      const phone = winner.userId.phone.replace(/\s/g, '');
-                      const phoneF = phone.startsWith('51') ? phone : '51' + phone;
+                      const cleanP = wPhone.replace(/\D/g, '');
+                      const phoneF = cleanP.startsWith('51') ? cleanP : '51' + cleanP;
                       const msg = winner.deliveryStatus === 'delivered' 
-                        ? `¡Hola ${winner.userId.name}! Tu premio de S/${winner.prizeValue} ya fue entregado. ¡Gracias por participar en SorteosPeru.pe! 🎉`
-                        : `¡Hola ${winner.userId.name}! 🏆 Ganaste S/${winner.prizeValue} en nuestro sorteo. Coordinaremos la entrega de tu premio. — SorteosPeru.pe`;
+                        ? `¡Hola ${wName}! Tu premio de S/${winner.prizeValue} ya fue entregado. ¡Gracias por participar en SorteosPeru.pe! 🎉`
+                        : `¡Hola ${wName}! 🏆 Ganaste S/${winner.prizeValue} en nuestro sorteo "${winner.raffleId ? winner.raffleId.title : ''}". Coordinaremos la entrega de tu premio. — SorteosPeru.pe`;
                     %>
-                    <a href="https://wa.me/<%= phoneF %>?text=<%= encodeURIComponent(msg) %>" target="_blank" class="btn btn-sm btn-outline-success mt-2">
+                    <a href="https://wa.me/<%= phoneF %>?text=<%= encodeURIComponent(msg) %>" target="_blank" class="btn btn-sm btn-outline-success mt-2 d-inline-block">
                       <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                   <% } %>

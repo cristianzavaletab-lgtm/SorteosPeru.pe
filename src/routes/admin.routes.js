@@ -16,6 +16,7 @@ router.post('/sorteos/:id/editar', upload.single('image'), adminController.updat
 router.post('/sorteos/:id/eliminar', adminController.deleteRaffle);
 router.get('/sorteos/:id/ejecutar', adminController.getDrawPage);
 router.post('/sorteos/:id/ejecutar', adminController.executeDraw);
+router.post('/sorteos/:id/anular-ganador', adminController.disqualifyAndRedraw);
 router.get('/ganadores', adminController.getWinners);
 router.get('/ganadores/:id', adminController.getWinner);
 router.post('/ganadores/:id/entregar', adminController.deliverPrize);

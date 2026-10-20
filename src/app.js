@@ -15,6 +15,16 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Normalizar URLs malformadas con /uploads/ duplicado o doble barra //
+app.use((req, res, next) => {
+  if (req.url && (req.url.includes('/uploads//uploads/') || req.url.includes('/uploads/uploads/'))) {
+    const cleaned = req.url.replace(/\/+/g, '/').replace(/\/uploads\/uploads\//, '/uploads/');
+    return res.redirect(301, cleaned);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(uploadsDir));
 
@@ -36,6 +46,7 @@ app.use('/', require('./routes/raffle.routes'));
 app.use('/', require('./routes/business.routes'));
 app.use('/recompensas', require('./routes/rewards.routes'));
 app.use('/auth', require('./routes/auth.routes'));
+app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/admin', require('./routes/admin.routes'));
 app.use('/pagos', require('./routes/payment.routes'));
 app.use('/push', require('./routes/push.routes'));

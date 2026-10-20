@@ -7,10 +7,13 @@ const winnerSchema = new mongoose.Schema({
   guestPhone: { type: String }, // For guest users
   ticketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket', required: true },
   prizeValue: { type: Number, required: true },
-  deliveryStatus: { type: String, enum: ['pending', 'delivered'], default: 'pending' },
+  deliveryStatus: { type: String, enum: ['pending', 'delivered', 'disqualified'], default: 'pending' },
   deliveryProofImage: { type: String },
   deliveryNote: { type: String },
-  deliveredAt: { type: Date }
+  deliveredAt: { type: Date },
+  disqualifiedReason: { type: String },
+  disqualifiedAt: { type: Date },
+  attemptNumber: { type: Number, default: 1 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Winner', winnerSchema);

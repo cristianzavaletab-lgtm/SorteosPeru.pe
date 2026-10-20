@@ -18,43 +18,66 @@
     </form>
   </div>
 
-  <div class="row g-4 mb-5">
-    <div class="col-md-3">
-      <div class="card bg-primary text-white border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title">Usuarios Totales</h5>
-          <h2 class="display-4 fw-bold mb-0"><%= totalUsers %></h2>
+  <div class="row g-3 g-md-4 mb-5">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-widget-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="small fw-bold text-uppercase text-theme-muted">Usuarios Registrados</span>
+            <div class="stat-icon-wrapper rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(124, 58, 237, 0.15); color: var(--primary-color);">
+              <i class="bi bi-people-fill fs-5"></i>
+            </div>
+          </div>
+          <h2 class="display-6 fw-bold mb-1 text-theme-light"><%= totalUsers %></h2>
+          <span class="small text-theme-muted">Total en plataforma</span>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card bg-success text-white border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title">Sorteos Activos</h5>
-          <h2 class="display-4 fw-bold mb-0"><%= activeRaffles %></h2>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-widget-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="small fw-bold text-uppercase text-theme-muted">Sorteos Activos</span>
+            <div class="stat-icon-wrapper rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              <i class="bi bi-trophy-fill fs-5"></i>
+            </div>
+          </div>
+          <h2 class="display-6 fw-bold mb-1 text-theme-light"><%= activeRaffles %></h2>
+          <span class="small text-theme-muted">Visibles para compra</span>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card bg-warning border-0 shadow-sm h-100" style="color: #000 !important;">
-        <div class="card-body">
-          <h5 class="card-title">Pagos Pendientes</h5>
-          <h2 class="display-4 fw-bold mb-0"><%= pendingPayments %></h2>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-widget-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="small fw-bold text-uppercase text-theme-muted">Pagos Pendientes</span>
+            <div class="stat-icon-wrapper rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+              <i class="bi bi-hourglass-split fs-5"></i>
+            </div>
+          </div>
+          <h2 class="display-6 fw-bold mb-1 text-theme-light"><%= pendingPayments %></h2>
+          <span class="small"><a href="/admin/pagos" class="text-decoration-none text-accent fw-bold">Ver y aprobar &rarr;</a></span>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card bg-info text-white border-0 shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Tickets Totales</h5>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-widget-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="small fw-bold text-uppercase text-theme-muted">Tickets Totales</span>
+            <div class="stat-icon-wrapper rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+              <i class="bi bi-ticket-perforated-fill fs-5"></i>
+            </div>
+          </div>
           <div class="d-flex justify-content-between align-items-end">
             <div>
-              <h3 class="display-6 fw-bold mb-0"><%= ticketsSold %></h3>
-              <span class="small text-white-50">Vendidos</span>
+              <h3 class="display-6 fw-bold mb-0 text-theme-light"><%= ticketsSold %></h3>
+              <span class="small text-theme-muted">Vendidos</span>
             </div>
             <div class="text-end">
-              <h3 class="display-6 fw-bold mb-0"><%= ticketsGifted %></h3>
-              <span class="small text-white-50">Regalados</span>
+              <h3 class="display-6 fw-bold mb-0 text-theme-light"><%= ticketsGifted %></h3>
+              <span class="small text-theme-muted">Regalados</span>
             </div>
           </div>
         </div>
@@ -103,41 +126,53 @@
     </div>
   </div>
 
-  <div class="row g-4 mb-5 row-cols-2 row-cols-lg-5">
+  <div class="row g-3 g-md-4 mb-5 row-cols-2 row-cols-md-3 row-cols-lg-6">
     <div class="col">
-      <a href="/admin/sorteos" class="btn btn-outline-primary w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-gift-fill fs-1 mb-2"></i>
-        <span class="fw-bold">Gestionar Sorteos</span>
+      <a href="/admin/sorteos" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(124, 58, 237, 0.15); color: var(--primary-color);">
+          <i class="bi bi-gift-fill fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Gestionar Sorteos</span>
       </a>
     </div>
     <div class="col">
-      <a href="/admin/pagos" class="btn btn-outline-warning w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-cash-coin fs-1 mb-2"></i>
-        <span class="fw-bold">Aprobar Pagos</span>
+      <a href="/admin/pagos" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+          <i class="bi bi-cash-coin fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Aprobar Pagos</span>
       </a>
     </div>
     <div class="col">
-      <a href="/admin/usuarios" class="btn btn-outline-success w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-people-fill fs-1 mb-2"></i>
-        <span class="fw-bold">Gestionar Usuarios</span>
+      <a href="/admin/usuarios" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+          <i class="bi bi-people-fill fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Gestionar Usuarios</span>
       </a>
     </div>
     <div class="col">
-      <a href="/admin/ganadores" class="btn btn-outline-info w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-trophy-fill fs-1 mb-2"></i>
-        <span class="fw-bold">Ganadores</span>
+      <a href="/admin/ganadores" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+          <i class="bi bi-trophy-fill fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Ganadores</span>
       </a>
     </div>
     <div class="col">
-      <a href="/admin/businesses" class="btn btn-outline-secondary w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-shop fs-1 mb-2"></i>
-        <span class="fw-bold text-wrap text-center">Negocios Aliados</span>
+      <a href="/admin/businesses" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(236, 72, 153, 0.15); color: var(--secondary-color);">
+          <i class="bi bi-shop fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Negocios Aliados</span>
       </a>
     </div>
     <div class="col">
-      <a href="/admin/vendedores" class="btn btn-outline-dark w-100 py-4 d-flex flex-column align-items-center justify-content-center h-100 shadow-sm border-2">
-        <i class="bi bi-person-badge fs-1 mb-2"></i>
-        <span class="fw-bold text-wrap text-center">Vendedores</span>
+      <a href="/admin/vendedores" class="card admin-action-card h-100 text-decoration-none p-3 text-center shadow-sm">
+        <div class="admin-action-icon rounded-3 mx-auto mb-2" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+          <i class="bi bi-person-badge fs-2"></i>
+        </div>
+        <span class="fw-bold text-theme-light small">Vendedores</span>
       </a>
     </div>
   </div>
@@ -156,10 +191,10 @@
           <p class="text-white-50 small mb-4">Envía una notificación a todos los usuarios que hayan aceptado permisos.</p>
           <div class="row g-3">
             <div class="col-md-4">
-              <input type="text" id="broadcastTitle" class="form-control bg-dark border-0 text-white" placeholder="Título (ej: ¡Nuevo Sorteo!)">
+              <input type="text" id="broadcastTitle" class="form-control text-white" style="background: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.2) !important;" placeholder="Título (ej: ¡Nuevo Sorteo!)">
             </div>
             <div class="col-md-6">
-              <input type="text" id="broadcastBody" class="form-control bg-dark border-0 text-white" placeholder="Mensaje (ej: Entra ya y participa...)">
+              <input type="text" id="broadcastBody" class="form-control text-white" style="background: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.2) !important;" placeholder="Mensaje (ej: Entra ya y participa...)">
             </div>
             <div class="col-md-2">
               <button onclick="sendBroadcast()" class="btn btn-primary w-100 fw-bold">Enviar a Todos</button>

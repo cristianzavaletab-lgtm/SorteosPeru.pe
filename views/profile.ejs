@@ -1,0 +1,339 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <!-- ALERTA DE SISTEMA -->
+  <% if (locals.success) { %>
+    <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert" style="background: rgba(16, 185, 129, 0.15); border-left: 5px solid #10b981 !important;">
+      <i class="bi bi-check-circle-fill fs-3 text-success me-3"></i>
+      <div>
+        <h6 class="fw-bold text-success mb-0">¡Excelente!</h6>
+        <span class="text-theme-light"><%= success %></span>
+      </div>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <% if (locals.error) { %>
+    <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert" style="background: rgba(239, 68, 68, 0.15); border-left: 5px solid #ef4444 !important;">
+      <i class="bi bi-exclamation-triangle-fill fs-3 text-danger me-3"></i>
+      <div>
+        <h6 class="fw-bold text-danger mb-0">Atención</h6>
+        <span class="text-theme-light"><%= error %></span>
+      </div>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <!-- PERFIL HERO -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(236, 72, 153, 0.85)); color: white;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-4 position-relative" style="z-index: 2;">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div class="position-relative">
+          <div class="rounded-circle d-flex align-items-center justify-content-center shadow-lg text-white fw-bold" style="width: 84px; height: 84px; font-size: 2.4rem; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4);">
+            <%= user.name.charAt(0).toUpperCase() %>
+          </div>
+          <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-warning text-dark border border-white" style="font-size: 0.7rem;">
+            <i class="bi bi-shield-fill-check"></i>
+          </span>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <h3 class="fw-bold mb-0 text-white"><%= user.name %></h3>
+            <span class="badge rounded-pill bg-light text-dark fw-bold px-3 py-1 text-uppercase" style="font-size: 0.75rem;">
+              <%= user.role === 'admin' ? 'Administrador' : (user.role === 'vendor' ? 'Vendedor Aliado' : 'Participante') %>
+            </span>
+          </div>
+          <p class="mb-1 opacity-90 small">
+            <i class="bi bi-envelope-fill me-1"></i> <%= user.email %>
+            <% if (user.googleId) { %>
+              <span class="badge rounded-pill bg-white text-dark ms-2 shadow-sm" style="font-size: 0.7rem;">
+                <svg width="12" height="12" viewBox="0 0 48 48" class="me-1">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                Google Vinculado
+              </span>
+            <% } %>
+          </p>
+          <p class="mb-0 opacity-75 small">
+            <i class="bi bi-calendar3 me-1"></i> Miembro desde: <%= new Date(user.createdAt).toLocaleDateString('es-PE', { month: 'long', year: 'numeric' }) %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Mascota Conejo Sorteos Perú -->
+      <div class="d-none d-md-flex align-items-center gap-3 bg-white bg-opacity-10 p-2 px-3 rounded-4 backdrop-blur">
+        <img src="/images/logo-conejo.png" alt="Mascota Sorteos Perú" style="width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
+        <div class="text-end">
+          <small class="d-block text-warning fw-bold text-uppercase" style="font-size: 0.7rem;">Mascota Oficial</small>
+          <span class="fw-bold" style="font-size: 0.95rem;">SorteosPeru.pe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS RÁPIDOS -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3 rounded-4 h-100 text-center stat-card bg-theme-card">
+        <div class="text-primary fs-3 mb-1"><i class="bi bi-ticket-perforated-fill"></i></div>
+        <h3 class="fw-bold mb-0 text-theme-light"><%= totalTickets %></h3>
+        <small class="text-theme-muted">Total Tickets</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3 rounded-4 h-100 text-center stat-card bg-theme-card">
+        <div class="text-success fs-3 mb-1"><i class="bi bi-lightning-charge-fill"></i></div>
+        <h3 class="fw-bold mb-0 text-theme-light"><%= activeTickets %></h3>
+        <small class="text-theme-muted">Tickets Activos</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3 rounded-4 h-100 text-center stat-card bg-theme-card">
+        <div class="text-warning fs-3 mb-1"><i class="bi bi-trophy-fill"></i></div>
+        <h3 class="fw-bold mb-0 text-theme-light"><%= totalWins %></h3>
+        <small class="text-theme-muted">Premios Ganados</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3 rounded-4 h-100 text-center stat-card bg-theme-card">
+        <div class="text-info fs-3 mb-1"><i class="bi bi-coin"></i></div>
+        <h3 class="fw-bold mb-0 text-theme-light"><%= user.credits || 0 %></h3>
+        <small class="text-theme-muted">Puntos SP</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- COLUMNA PRINCIPAL DE EDICIÓN -->
+    <div class="col-lg-8">
+      
+      <!-- CARD 1: WHATSAPP Y CELULAR (MÓDULO SOLICITADO) -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-theme-card">
+        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(37, 211, 102, 0.15); color: #25D366; font-size: 1.4rem;">
+              <i class="bi bi-whatsapp"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0 text-theme-light">Número de Celular / WhatsApp</h5>
+              <small class="text-theme-muted">Canal oficial para enviarte tickets aprobados y llamarte en vivo si ganas.</small>
+            </div>
+          </div>
+          <% if (user.phone) { %>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold">
+              <i class="bi bi-check-circle-fill me-1"></i> Activo
+            </span>
+          <% } else { %>
+            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill fw-bold">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i> Sin Registrar
+            </span>
+          <% } %>
+        </div>
+
+        <form action="/perfil/telefono" method="POST">
+          <input type="hidden" name="returnUrl" value="/perfil">
+          
+          <div class="mb-3">
+            <label class="form-label text-theme-muted small fw-bold">NÚMERO DE WHATSAPP (9 DÍGITOS)</label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-theme-input text-success fw-bold border-theme">
+                <i class="bi bi-whatsapp me-1"></i> +51
+              </span>
+              <input type="tel" name="phone" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" 
+                     placeholder="918762620" value="<%= user.phone || '' %>" 
+                     maxlength="9" pattern="[0-9]{9}" required>
+              <button class="btn btn-success fw-bold px-4" type="submit" style="background-color: #25D366; border-color: #25D366;">
+                <i class="bi bi-check2-circle me-1"></i> Guardar Celular
+              </button>
+            </div>
+            <div class="form-text small text-theme-muted mt-2">
+              <i class="bi bi-info-circle me-1"></i> Asegúrate de ingresar tu número personal activo en WhatsApp para que puedas reclamar tus premios inmediatamente.
+            </div>
+          </div>
+        </form>
+
+        <% if (user.phone) { %>
+          <div class="p-3 rounded-3 mt-2 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(37, 211, 102, 0.06); border: 1px dashed rgba(37, 211, 102, 0.3);">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-phone text-success fs-5"></i>
+              <span class="small text-theme-light">Número configurado: <strong class="font-monospace text-success">+51 <%= user.phone %></strong></span>
+            </div>
+            <a href="https://wa.me/51<%= user.phone %>?text=<%= encodeURIComponent('¡Hola! Este es un mensaje de prueba para verificar mi WhatsApp en SorteosPeru.pe 🍀') %>" target="_blank" class="btn btn-sm btn-outline-success rounded-pill fw-bold">
+              <i class="bi bi-send-check me-1"></i> Probar en WhatsApp
+            </a>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- CARD 2: DATOS PERSONALES -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-theme-card">
+        <div class="d-flex align-items-center gap-2 mb-3 border-bottom pb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(124, 58, 237, 0.15); color: var(--primary-color); font-size: 1.4rem;">
+            <i class="bi bi-person-gear"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0 text-theme-light">Datos Personales</h5>
+            <small class="text-theme-muted">Tus nombres y apellidos oficiales para emitir tus tickets y certificados de premiación.</small>
+          </div>
+        </div>
+
+        <form action="/perfil/datos" method="POST">
+          <div class="mb-3">
+            <label class="form-label text-theme-muted small fw-bold">NOMBRES Y APELLIDOS COMPLETOS</label>
+            <input type="text" name="name" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" value="<%= user.name %>" required minlength="3">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-theme-muted small fw-bold">CORREO ELECTRÓNICO (PRINCIPAL)</label>
+            <input type="email" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" value="<%= user.email %>" readonly disabled style="opacity: 0.8;">
+            <div class="form-text small text-theme-muted">El correo electrónico está vinculado a tu cuenta y no puede modificarse directamente por seguridad.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary fw-bold px-4 rounded-pill">
+            <i class="bi bi-save me-1"></i> Actualizar Nombres
+          </button>
+        </form>
+      </div>
+
+      <!-- CARD 3: CAMBIO DE CONTRASEÑA -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-theme-card">
+        <div class="d-flex align-items-center gap-2 mb-3 border-bottom pb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(236, 72, 153, 0.15); color: var(--secondary-color); font-size: 1.4rem;">
+            <i class="bi bi-shield-lock"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0 text-theme-light">Seguridad y Contraseña</h5>
+            <small class="text-theme-muted">Protege tu cuenta con una contraseña segura de mínimo 6 caracteres.</small>
+          </div>
+        </div>
+
+        <form action="/perfil/password" method="POST" id="passwordForm">
+          <% if (user.password && !user.password.startsWith('GOOGLE_OAUTH_USER_')) { %>
+            <div class="mb-3">
+              <label class="form-label text-theme-muted small fw-bold">CONTRASEÑA ACTUAL</label>
+              <div class="input-group">
+                <input type="password" name="currentPassword" id="currentPassInput" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" placeholder="Ingresa tu contraseña actual" required>
+                <button class="btn btn-outline-secondary border-theme" type="button" onclick="togglePassVisibility('currentPassInput', this)">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="alert alert-info border-0 rounded-3 small p-3 mb-3">
+              <i class="bi bi-info-circle-fill me-2"></i> Te registraste originalmente con Google. Puedes asignar una contraseña directa a tu cuenta para iniciar sesión con tu correo en cualquier momento.
+            </div>
+          <% } %>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label text-theme-muted small fw-bold">NUEVA CONTRASEÑA (MÍN. 6 CARACTERES)</label>
+              <div class="input-group">
+                <input type="password" name="newPassword" id="newPassInput" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                <button class="btn btn-outline-secondary border-theme" type="button" onclick="togglePassVisibility('newPassInput', this)">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-theme-muted small fw-bold">CONFIRMAR NUEVA CONTRASEÑA</label>
+              <div class="input-group">
+                <input type="password" name="confirmPassword" id="confirmPassInput" class="form-control form-control-lg bg-theme-input text-theme-light border-theme" placeholder="Repite la nueva contraseña" minlength="6" required>
+                <button class="btn btn-outline-secondary border-theme" type="button" onclick="togglePassVisibility('confirmPassInput', this)">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-warning fw-bold px-4 rounded-pill text-dark">
+            <i class="bi bi-key-fill me-1"></i> Cambiar Contraseña
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA LATERAL (INFORMACIÓN Y CONTACTO) -->
+    <div class="col-lg-4">
+      
+      <!-- Card Mascota y Soporte Oficial -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center bg-theme-card">
+        <div class="mb-3 position-relative d-inline-block mx-auto">
+          <img src="/images/logo-conejo.png" alt="Conejo Sorteos Perú" class="img-fluid rounded-4 shadow-sm" style="max-height: 140px; object-fit: contain;">
+        </div>
+        <h5 class="fw-bold mb-1 text-theme-light">SorteosPeru.pe Oficial</h5>
+        <p class="text-theme-muted small mb-3">Transparencia, pagos instantáneos por Yape/Plin y premios reales.</p>
+        
+        <div class="p-3 rounded-4 mb-3" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.2);">
+          <small class="text-uppercase tracking-wider text-muted fw-bold d-block mb-1" style="font-size: 0.72rem;">Número Oficial de Sorteos Perú</small>
+          <h4 class="fw-bold text-primary mb-1 font-monospace">918 762 620</h4>
+          <span class="small text-theme-muted">Titular: Cristian Zavaleta</span>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="https://wa.me/51918762620?text=<%= encodeURIComponent(`¡Hola Cristian! Soy ${user.name} y te contacto desde SorteosPeru.pe para soporte.`) %>" target="_blank" class="btn btn-success fw-bold rounded-pill" style="background-color: #25D366; border-color: #25D366;">
+            <i class="bi bi-whatsapp me-2"></i> Soporte Oficial por WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Accesos Rápidos -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-theme-card">
+        <h6 class="fw-bold mb-3 text-theme-light text-uppercase tracking-wider small">
+          <i class="bi bi-grid-fill text-primary me-2"></i> Accesos Rápidos
+        </h6>
+        <div class="d-grid gap-2">
+          <a href="/dashboard" class="btn btn-outline-primary text-start rounded-3 py-2 fw-semibold">
+            <i class="bi bi-ticket-perforated me-2"></i> Mis Tickets y Dashboard
+          </a>
+          <a href="/sorteos" class="btn btn-outline-secondary text-start rounded-3 py-2 fw-semibold">
+            <i class="bi bi-trophy me-2 text-warning"></i> Ver Sorteos Activos
+          </a>
+          <a href="/recompensas" class="btn btn-outline-secondary text-start rounded-3 py-2 fw-semibold">
+            <i class="bi bi-gift me-2 text-info"></i> Zona de Recompensas SP
+          </a>
+          <a href="/canjear" class="btn btn-outline-secondary text-start rounded-3 py-2 fw-semibold">
+            <i class="bi bi-tag me-2 text-success"></i> Canjear Código Aliado
+          </a>
+          <hr class="border-secondary opacity-25 my-2">
+          <a href="/auth/logout" class="btn btn-outline-danger text-start rounded-3 py-2 fw-semibold">
+            <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'bi bi-eye-slash-fill';
+    } else {
+      input.type = 'password';
+      icon.className = 'bi bi-eye-fill';
+    }
+  }
+
+  // Validación rápida de confirmación de password
+  const passForm = document.getElementById('passwordForm');
+  if (passForm) {
+    passForm.addEventListener('submit', function(e) {
+      const newPass = document.getElementById('newPassInput').value;
+      const confPass = document.getElementById('confirmPassInput').value;
+      if (newPass !== confPass) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden. Por favor verifica que ambas sean idénticas.');
+      }
+    });
+  }
+</script>
+
+<%- include('partials/footer') %>

@@ -142,10 +142,35 @@
                                         <%= sale.raffleId ? sale.raffleId.title : 'Sorteo Eliminado' %>
                                     </td>
                                     <td class="py-3">
+                                        <%
+                                          const cName = sale.userId ? sale.userId.name : (sale.guestName || 'Usuario Web');
+                                          const cPhone = sale.userId ? (sale.userId.phone || '') : (sale.guestPhone || '');
+                                          let cWaLink = '';
+                                          if (cPhone) {
+                                            const cClean = cPhone.replace(/\D/g, '');
+                                            const cPf = cClean.startsWith('51') ? cClean : '51' + cClean;
+                                            const cMsg = encodeURIComponent(`Hola ${cName}, te saluda tu vendedor de SorteosPeru.pe sobre tu compra de ${sale.ticketQty} tickets.`);
+                                            cWaLink = `https://wa.me/${cPf}?text=${cMsg}`;
+                                          }
+                                        %>
                                         <div class="fw-bold text-theme-light d-flex align-items-center">
-                                            <i class="bi bi-person-circle text-secondary me-2"></i> <%= sale.guestName || 'Usuario Web' %>
+                                            <i class="bi bi-person-circle text-secondary me-2"></i> <%= cName %>
+                                            <% if (sale.userId) { %>
+                                                <span class="badge bg-info bg-opacity-25 text-info ms-2" style="font-size: 0.65rem;">Registrado</span>
+                                            <% } else { %>
+                                                <span class="badge bg-secondary bg-opacity-25 text-theme-muted ms-2" style="font-size: 0.65rem;">Invitado</span>
+                                            <% } %>
                                         </div>
-                                        <div class="small text-theme-muted ms-4"><%= sale.guestPhone || '' %></div>
+                                        <% if (cPhone) { %>
+                                            <div class="mt-1 ms-4 d-flex align-items-center gap-2">
+                                                <span class="small text-theme-muted"><%= cPhone %></span>
+                                                <a href="<%= cWaLink %>" target="_blank" class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 text-decoration-none px-2 py-1" title="Enviar WhatsApp al cliente">
+                                                    <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                                                </a>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="small text-theme-muted ms-4">Sin teléfono</div>
+                                        <% } %>
                                     </td>
                                     <td class="py-3 text-center">
                                         <span class="badge border border-warning text-warning rounded-circle p-2 fs-6 shadow-sm" style="background: var(--bg-darker); width: 35px; height: 35px; line-height: 1;">

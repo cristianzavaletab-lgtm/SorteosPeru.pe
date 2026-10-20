@@ -50,6 +50,7 @@ const checkUser = async (req, res, next) => {
   } else {
     res.locals.user = null;
   }
+  res.locals.googleClientId = process.env.GOOGLE_CLIENT_ID || '';
   next();
 };
 

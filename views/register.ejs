@@ -1,10 +1,14 @@
 <%- include('partials/header') %>
 
+<!-- Google Identity Services SDK -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
       <div class="card shadow p-4 p-md-5 border-0">
         <div class="text-center mb-4">
+          <img src="/images/logo-conejo.png" alt="Sorteos Perú" style="width: 70px; height: 70px; object-fit: contain; margin-bottom: 0.75rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
           <h2 class="fw-bold" style="color: var(--secondary-color);">Crea tu cuenta</h2>
           <p class="text-muted">Únete para participar en nuestros sorteos</p>
         </div>
@@ -14,17 +18,42 @@
             <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
           </div>
         <% } %>
+
+        <!-- Google Register / One-click (Un solo botón elegante) -->
+        <div class="mb-4">
+          <div id="g_id_register" class="d-flex justify-content-center mb-1" style="min-height: 44px;"></div>
+          <!-- Botón de respaldo (oculto por defecto para no duplicarse nunca) -->
+          <button type="button" class="btn btn-outline-secondary w-100 py-2 align-items-center justify-content-center gap-2 rounded-pill shadow-sm border" id="googleRegisterBtn" style="font-weight: 500; font-size: 0.95rem; display: none;">
+            <svg width="20" height="20" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Registrarse con Google
+          </button>
+
+          <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1 border-secondary border-opacity-25 my-0">
+            <span class="px-3 text-muted small fw-medium">o completa tus datos</span>
+            <hr class="flex-grow-1 border-secondary border-opacity-25 my-0">
+          </div>
+        </div>
         
         <form action="/auth/register" method="POST" id="registerForm">
           <div class="row">
-            <div class="col-md-12 mb-3">
-              <label class="form-label text-muted small fw-bold">Nombre Completo</label>
-              <input type="text" class="form-control form-control-lg" name="name" required placeholder="Juan Pérez">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted small fw-bold">Nombres</label>
+              <input type="text" class="form-control form-control-lg" name="nombres" required placeholder="Juan Carlos">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted small fw-bold">Apellidos</label>
+              <input type="text" class="form-control form-control-lg" name="apellidos" required placeholder="Pérez Rodríguez">
             </div>
             <div class="col-md-12 mb-3">
               <label class="form-label text-muted small fw-bold">WhatsApp (9 dígitos)</label>
               <input type="tel" class="form-control form-control-lg" name="phone" required pattern="[0-9]{9}" placeholder="999888777" value="<%= typeof phone !== 'undefined' ? phone : '' %>">
-              <div class="form-text small">Debe ser un número real para contactarte.</div>
+              <div class="form-text small">Debe ser tu número real para contactarte cuando ganes.</div>
             </div>
             <div class="col-md-12 mb-3">
               <label class="form-label text-muted small fw-bold">Correo Electrónico</label>
@@ -32,36 +61,37 @@
               <div class="form-text small">Máximo una cuenta por correo.</div>
             </div>
             <div class="col-md-12 mb-4">
-              <label class="form-label text-muted small fw-bold">Contraseña</label>
+              <label class="form-label text-muted small fw-bold">Contraseña (Mínimo 6 caracteres)</label>
               <div class="input-group">
-                <input type="password" class="form-control form-control-lg" name="password" id="passwordInput" required placeholder="••••••••">
+                <input type="password" class="form-control form-control-lg" name="password" id="passwordInput" required minlength="6" placeholder="Mínimo 6 caracteres">
                 <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                   <i class="bi bi-eye-fill text-muted"></i>
                 </button>
               </div>
+              <div class="form-text small">Tu contraseña debe tener al menos 6 caracteres.</div>
             </div>
           </div>
 
           <div class="mb-3">
             <div class="form-check small mb-2">
-              <input class="form-check-input" type="checkbox" id="termsCheck" required>
+              <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
               <label class="form-check-label text-muted" for="termsCheck">
                 Acepto los <a href="#" class="text-decoration-none">Términos y Condiciones</a>
               </label>
             </div>
             <div class="form-check small mb-4">
-              <input class="form-check-input" type="checkbox" id="privacyCheck" required>
+              <input class="form-check-input" type="checkbox" id="privacyCheck" required checked>
               <label class="form-check-label text-muted" for="privacyCheck">
                 Acepto la <a href="#" class="text-decoration-none">Política de Privacidad</a>
               </label>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="submitBtn" disabled>Registrarse</button>
+          <button type="submit" class="btn btn-primary btn-lg w-100 mb-3 fw-bold" id="submitBtn">Crear Cuenta</button>
         </form>
         
         <div class="text-center mt-3">
-          <p class="text-muted small">¿Ya tienes cuenta? <a href="/login" class="fw-bold text-accent text-decoration-none" style="color: var(--accent-color)">Inicia sesión</a></p>
+          <p class="text-muted small">¿Ya tienes cuenta? <a href="/login" class="fw-bold text-accent text-decoration-none" style="color: var(--accent-color)">Inicia sesión aquí</a></p>
         </div>
       </div>
     </div>
@@ -81,17 +111,87 @@
     toggleIcon.classList.toggle('bi-eye-slash-fill');
   });
 
-  // Enable/Disable Submit Button
+  // Validación de Términos al Enviar Formulario
+  const registerForm = document.querySelector('#registerForm');
   const termsCheck = document.querySelector('#termsCheck');
   const privacyCheck = document.querySelector('#privacyCheck');
-  const submitBtn = document.querySelector('#submitBtn');
 
-  function updateButtonState() {
-    submitBtn.disabled = !(termsCheck.checked && privacyCheck.checked);
+  if (registerForm) {
+    registerForm.addEventListener('submit', function(e) {
+      if (!termsCheck.checked || !privacyCheck.checked) {
+        e.preventDefault();
+        alert('Debes aceptar los Términos y Condiciones y la Política de Privacidad para continuar.');
+      }
+    });
   }
 
-  termsCheck.addEventListener('change', updateButtonState);
-  privacyCheck.addEventListener('change', updateButtonState);
+  // Google Sign-In / Register Handler
+  const googleClientId = "<%= googleClientId || '' %>";
+
+  async function handleGoogleRegister(response) {
+    const cred = response ? (response.credential || response.token) : null;
+    if (!cred) return;
+    try {
+      const res = await fetch('/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: cred, token: cred })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = data.redirectUrl || '/dashboard';
+      } else {
+        alert(data.error || 'Error al registrarse con Google');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de conexión al conectar con Google');
+    }
+  }
+
+  document.getElementById('googleRegisterBtn').addEventListener('click', () => {
+    if (googleClientId && window.google) {
+      google.accounts.id.prompt();
+    } else {
+      const promptCredential = prompt('Ingresa tu Google ID Token (o configura GOOGLE_CLIENT_ID en .env):');
+      if (promptCredential) {
+        handleGoogleRegister({ credential: promptCredential });
+      }
+    }
+  });
+
+  window.addEventListener('load', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const regContainer = document.getElementById('g_id_register');
+    const customBtn = document.getElementById('googleRegisterBtn');
+
+    if (googleClientId && window.google && window.google.accounts) {
+      try {
+        google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleRegister,
+          auto_select: false
+        });
+
+        if (regContainer) {
+          google.accounts.id.renderButton(regContainer, {
+            theme: isLight ? 'outline' : 'filled_black',
+            size: 'large',
+            width: regContainer.offsetWidth || 340,
+            shape: 'pill',
+            text: 'signup_with',
+            logo_alignment: 'left'
+          });
+          if (customBtn) customBtn.style.display = 'none';
+        }
+      } catch (e) {
+        console.warn('Google GIS init register error:', e);
+        if (customBtn) customBtn.style.display = 'flex';
+      }
+    } else {
+      if (customBtn) customBtn.style.display = 'flex';
+    }
+  });
 </script>
 
 <%- include('partials/footer') %>

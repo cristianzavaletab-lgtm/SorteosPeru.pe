@@ -1,4 +1,12 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Configuración DNS para resolución de registros SRV en Windows/Atlas
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignorar si el entorno no permite modificar servidores DNS
+}
 
 const connectDB = async (retries = 5) => {
   for (let i = 0; i < retries; i++) {

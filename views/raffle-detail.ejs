@@ -31,7 +31,7 @@
         <div class="card-body p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="fw-bold mb-0"><%= raffle.title %></h2>
-            <span class="badge bg-white fs-5 px-3 py-2 border" style="color: var(--accent-color); border-color: var(--accent-color) !important;"><i class="bi bi-tag-fill"></i> S/<%= raffle.ticketPrice.toFixed(2) %></span>
+            <span class="badge bg-warning fs-5 px-3 py-2 shadow-sm"><i class="bi bi-tag-fill me-1"></i> S/<%= raffle.ticketPrice.toFixed(2) %></span>
           </div>
 
           <% if (raffle.description) { %>
@@ -40,32 +40,32 @@
 
           <!-- Fecha y hora del sorteo con cuenta regresiva -->
           <% if (raffle.drawDate) { %>
-            <div class="bg-light p-4 rounded-3 mb-4 text-center">
-              <p class="text-muted small mb-1">El sorteo se realiza el</p>
-              <h4 class="fw-bold mb-2" style="color: var(--accent-color);">
-                <i class="bi bi-calendar-event"></i>
+            <div class="card bg-theme-elevated p-4 rounded-4 mb-4 text-center border-theme">
+              <p class="text-muted small mb-1 fw-bold text-uppercase tracking-wider">El sorteo se realiza el</p>
+              <h4 class="fw-bold mb-2 text-accent">
+                <i class="bi bi-calendar-event me-1"></i>
                 <%= raffle.drawDate.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %>
               </h4>
-              <h5 class="fw-bold mb-3">
-                <i class="bi bi-clock"></i>
+              <h5 class="fw-bold mb-3 text-theme-muted">
+                <i class="bi bi-clock me-1"></i>
                 <%= raffle.drawDate.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12: true}) %>
               </h5>
-              <div id="countdown" class="d-flex justify-content-center gap-3">
+              <div id="countdown" class="d-flex justify-content-center gap-2 gap-sm-3">
                 <div class="text-center">
-                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="days" style="background-color: var(--accent-color);">--</div>
-                  <small class="text-muted">Días</small>
+                  <div class="countdown-box shadow-sm" id="days">--</div>
+                  <small class="text-muted fw-semibold">Días</small>
                 </div>
                 <div class="text-center">
-                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="hours" style="background-color: var(--accent-color);">--</div>
-                  <small class="text-muted">Horas</small>
+                  <div class="countdown-box shadow-sm" id="hours">--</div>
+                  <small class="text-muted fw-semibold">Horas</small>
                 </div>
                 <div class="text-center">
-                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="minutes" style="background-color: var(--accent-color);">--</div>
-                  <small class="text-muted">Min</small>
+                  <div class="countdown-box shadow-sm" id="minutes">--</div>
+                  <small class="text-muted fw-semibold">Min</small>
                 </div>
                 <div class="text-center">
-                  <div class="text-white rounded-3 px-3 py-2 fw-bold fs-4" id="seconds" style="background-color: var(--accent-color);">--</div>
-                  <small class="text-muted">Seg</small>
+                  <div class="countdown-box shadow-sm" id="seconds">--</div>
+                  <small class="text-muted fw-semibold">Seg</small>
                 </div>
               </div>
             </div>

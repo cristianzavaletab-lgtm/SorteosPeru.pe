@@ -18,7 +18,19 @@ const raffleSchema = new mongoose.Schema({
   endDate: { type: Date },
   drawDate: { type: Date }, // Fecha y hora exacta del sorteo
   streamUrl: { type: String }, // Link de YouTube/Facebook/Twitch
-  winnerTicketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }
+  winnerTicketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' },
+  drawAttempts: [{
+    attemptNumber: { type: Number, required: true },
+    ticketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' },
+    ticketNumber: { type: String },
+    winnerName: { type: String },
+    winnerPhone: { type: String },
+    winnerEmail: { type: String },
+    drawnAt: { type: Date, default: Date.now },
+    status: { type: String, enum: ['valid', 'disqualified', 'confirmed'], default: 'valid' },
+    disqualifiedReason: { type: String },
+    disqualifiedAt: { type: Date }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Raffle', raffleSchema);

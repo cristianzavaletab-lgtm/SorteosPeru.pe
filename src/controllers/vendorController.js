@@ -10,7 +10,10 @@ exports.getDashboard = async (req, res) => {
     const vendorId = req.user._id;
 
     // Fetch vendor's sales
-    const sales = await Payment.find({ vendorId }).populate('raffleId').sort({ createdAt: -1 });
+    const sales = await Payment.find({ vendorId })
+      .populate('raffleId')
+      .populate('userId', 'name phone email')
+      .sort({ createdAt: -1 });
     
     // Calculate stats
     let totalSalesAmount = 0;

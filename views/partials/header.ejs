@@ -37,28 +37,29 @@
 </head>
 <body>
 <!-- Banner Top Promocional -->
-<div class="bg-primary text-white text-center py-2" style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); font-size: 0.9rem;">
-  <div class="container fw-bold">
+<div class="text-white text-center py-2 px-2 shadow-sm" style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); font-size: clamp(0.78rem, 2.5vw, 0.88rem);">
+  <div class="container fw-semibold">
     <i class="bi bi-gift-fill text-warning me-1"></i> 
-    ¿Tienes un código de un Negocio Aliado? 
-    <a href="/canjear" class="text-white text-decoration-underline ms-1">Canjéalo aquí y obtén tu ticket gratis</a>
+    ¿Tienes código de un Negocio Aliado? 
+    <a href="/canjear" class="text-white text-decoration-underline fw-bold ms-1">Canjéalo aquí gratis</a>
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand brand-text" href="/">
-      <i class="bi bi-graph-up-arrow"></i> SorteosPeru<span style="color:var(--accent-color)">.</span>pe
+    <a class="navbar-brand brand-text d-flex align-items-center gap-2" href="/">
+      <img src="/images/logo-conejo.png" alt="Sorteos Perú" style="width: 36px; height: 36px; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); flex-shrink: 0;">
+      <span>SorteosPeru<span style="color:var(--accent-color)">.</span>pe</span>
     </a>
     <div class="d-flex align-items-center ms-auto d-lg-none me-2">
       <!-- Theme Toggle (Mobile) -->
-      <button id="themeToggleMobile" class="btn btn-link nav-link px-2 text-decoration-none" onclick="toggleTheme()">
+      <button id="themeToggleMobile" class="btn btn-link nav-link px-2 text-decoration-none" onclick="toggleTheme()" aria-label="Cambiar tema">
         <i class="bi bi-moon-stars-fill fs-4" id="themeIconMobile"></i>
       </button>
     </div>
 
-    <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <i class="bi bi-list fs-1" style="color: var(--text-light);"></i>
+    <button class="navbar-toggler border-0 shadow-none px-2 rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Menú" style="background: var(--primary-light);">
+      <i class="bi bi-list fs-2" style="color: var(--text-light);"></i>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
@@ -120,13 +121,15 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
               <% if (user.role === 'admin') { %>
-                <li><a class="dropdown-item py-2" href="/admin"><i class="bi bi-speedometer2 me-2"></i>Panel Admin</a></li>
+                <li><a class="dropdown-item py-2" href="/admin"><i class="bi bi-speedometer2 me-2 text-danger"></i>Panel Admin</a></li>
                 <li><hr class="dropdown-divider border-secondary opacity-25"></li>
               <% } else if (user.role === 'vendor') { %>
                 <li><a class="dropdown-item py-2 text-warning" href="/vendor/dashboard"><i class="bi bi-person-badge me-2"></i>Panel Vendedor</a></li>
                 <li><hr class="dropdown-divider border-secondary opacity-25"></li>
               <% } %>
-              <li><a class="dropdown-item py-2" href="/dashboard"><i class="bi bi-ticket-perforated me-2"></i>Mis Tickets</a></li>
+              <li><a class="dropdown-item py-2" href="/perfil"><i class="bi bi-person-gear me-2 text-primary"></i>Mi Perfil</a></li>
+              <li><a class="dropdown-item py-2" href="/dashboard"><i class="bi bi-ticket-perforated me-2 text-success"></i>Mis Tickets</a></li>
+              <li><a class="dropdown-item py-2" href="/recompensas"><i class="bi bi-gift me-2 text-info"></i>Recompensas SP</a></li>
               <li><hr class="dropdown-divider border-secondary opacity-25"></li>
               <li><a class="dropdown-item text-danger py-2" href="/auth/logout"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
             </ul>
@@ -144,22 +147,58 @@
   </div>
 </nav>
 
-<!-- PWA Install Banner (Hidden by default) -->
-<div id="pwaBanner" class="pwa-banner d-none">
-  <div class="pwa-banner-content">
-    <div class="pwa-banner-icon" style="background: transparent; box-shadow: none;">
-      <img src="/images/logo-sp.png" alt="SP" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+<!-- PWA Install Banner (Fixed floating toast, mascot icon) -->
+<div id="pwaBanner" class="pwa-banner" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 480px; width: calc(100% - 32px);">
+  <div class="pwa-banner-content d-flex align-items-center gap-2" style="min-width: 0;">
+    <div class="pwa-banner-icon" style="width: 44px; height: 44px; min-width: 44px; max-width: 44px; max-height: 44px; overflow: hidden; flex-shrink: 0; background: transparent; box-shadow: none;">
+      <img src="/images/logo-conejo.png" alt="Sorteos Perú" style="width: 44px !important; height: 44px !important; max-width: 44px !important; max-height: 44px !important; object-fit: contain; border-radius: 12px; display: block;">
     </div>
-    <div class="pwa-banner-text">
-      <h6>Instala SorteosPeru.pe</h6>
-      <p>Acceso rápido y mejor experiencia sin conexión</p>
+    <div class="pwa-banner-text" style="min-width: 0;">
+      <h6 class="mb-0 fw-bold text-truncate" style="font-size: 0.925rem;">Instala SorteosPeru.pe</h6>
+      <p class="mb-0 small text-muted" style="font-size: 0.75rem; line-height: 1.2;">Acceso rápido y mejor experiencia</p>
     </div>
   </div>
-  <div class="pwa-banner-actions">
+  <div class="pwa-banner-actions d-flex align-items-center gap-2 flex-shrink-0">
     <button id="pwaInstallBtn" class="btn-pwa-install">INSTALAR</button>
-    <button id="pwaCloseBanner" class="btn-pwa-close" onclick="closePwaBanner()">
+    <button id="pwaCloseBanner" class="btn-pwa-close" onclick="closePwaBanner()" aria-label="Cerrar">
       <i class="bi bi-x-lg"></i>
     </button>
+  </div>
+</div>
+
+<!-- Modal Guía de Instalación PWA -->
+<div class="modal fade" id="pwaInstallModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="background: var(--card-bg-solid, #1C1331); color: var(--text-light, #fff);">
+      <div class="modal-header border-bottom border-secondary border-opacity-25 px-4 py-3">
+        <div class="d-flex align-items-center gap-2">
+          <img src="/images/logo-conejo.png" alt="SP" style="width: 32px; height: 32px; object-fit: contain;">
+          <h5 class="modal-title fw-bold mb-0">Instalar SorteosPeru.pe</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3">
+          <img src="/images/logo-conejo.png" alt="Conejo Oficial" style="width: 85px; height: 85px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">
+        </div>
+        <h5 class="fw-bold mb-2">Instala la App en tu Dispositivo</h5>
+        <p class="text-muted small mb-4">Accede a tus tickets más rápido, recibe avisos en vivo cuando ganes y juega sin ocupar espacio en tu memoria.</p>
+        
+        <div class="text-start p-3 rounded-3 mb-3" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.2);">
+          <h6 class="fw-bold small mb-2 text-primary"><i class="bi bi-android2 me-1"></i> En Chrome / Android / PC:</h6>
+          <p class="small text-muted mb-0">Toca el menú de tu navegador <i class="bi bi-three-dots-vertical"></i> y presiona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</p>
+        </div>
+
+        <div class="text-start p-3 rounded-3 mb-3" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
+          <h6 class="fw-bold small mb-2 text-warning"><i class="bi bi-apple me-1"></i> En iPhone / Safari:</h6>
+          <p class="small text-muted mb-0">Toca el botón Compartir <i class="bi bi-box-arrow-up"></i> (al pie de Safari) y elige <strong>"Agregar al inicio"</strong>.</p>
+        </div>
+
+        <button type="button" class="btn btn-primary rounded-pill w-100 fw-bold py-2 mt-2" data-bs-dismiss="modal">
+          ¡Entendido!
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -204,25 +243,40 @@
   const pwaBanner = document.getElementById('pwaBanner');
   const pwaInstallBtn = document.getElementById('pwaInstallBtn');
 
+  // Si ya está ejecutándose en modo app/standalone, no mostrar banner
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isStandalone && pwaBanner) {
+    pwaBanner.classList.add('d-none');
+  } else if (pwaBanner && sessionStorage.getItem('pwaBannerDismissed')) {
+    pwaBanner.classList.add('d-none');
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     
-    // Solo mostrar si el usuario no lo ha cerrado antes en esta sesión
-    if (!sessionStorage.getItem('pwaBannerDismissed')) {
+    // Mostrar si el usuario no lo ha descartado en esta sesión
+    if (!isStandalone && !sessionStorage.getItem('pwaBannerDismissed')) {
       if (pwaBanner) pwaBanner.classList.remove('d-none');
     }
-    console.log('PWA: Ready to install');
   });
 
   if (pwaInstallBtn) {
     pwaInstallBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`PWA: User response to install: ${outcome}`);
-      deferredPrompt = null;
-      if (pwaBanner) pwaBanner.classList.add('d-none');
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`PWA: User response to install: ${outcome}`);
+        deferredPrompt = null;
+        if (pwaBanner) pwaBanner.classList.add('d-none');
+      } else {
+        // Si no hay prompt nativo disponible (iOS, PC o disparado), mostrar modal interactivo
+        const modalEl = document.getElementById('pwaInstallModal');
+        if (modalEl && window.bootstrap) {
+          const installModal = new bootstrap.Modal(modalEl);
+          installModal.show();
+        }
+      }
     });
   }
 

@@ -36,11 +36,17 @@ exports.submitPayment = async (req, res) => {
       return res.status(400).send('Este sorteo ya está cerrado. No se aceptan más compras.');
     }
 
-    const { amount, paymentMethod, ticketQty } = req.body;
-    const receiptImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const { amount, paymentMethod, ticketQty, buyerPhone } = req.body;
+    const receiptImage = req.file ? req.file.filename : null;
 
     if (!receiptImage) {
       return res.status(400).send('Debe subir un comprobante');
+    }
+
+    // Si el usuario ingresó o actualizó su teléfono en la compra, guardarlo
+    if (buyerPhone && /^[0-9]{9}$/.test(buyerPhone.trim()) && req.user) {
+      const User = require('../models/User');
+      await User.findByIdAndUpdate(req.user._id, { phone: buyerPhone.trim() });
     }
 
     const payment = await Payment.create({

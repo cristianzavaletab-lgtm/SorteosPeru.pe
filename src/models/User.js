@@ -3,9 +3,15 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  firstName: { type: String },
+  lastName: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String, required: true },
+  phone: { type: String, default: '' },
+  googleId: { type: String, sparse: true },
+  avatar: { type: String },
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date },
   role: { type: String, enum: ['user', 'admin', 'vendor'], default: 'user' },
   status: { type: String, enum: ['active', 'blocked'], default: 'active' },
   // Vendor Fields

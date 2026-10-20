@@ -8,7 +8,7 @@ const ticketSchema = new mongoose.Schema({
   raffleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Raffle', required: true },
   paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
   ticketNumber: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['pending', 'valid', 'winner', 'cancelled'], default: 'valid' },
+  status: { type: String, enum: ['pending', 'valid', 'winner', 'disqualified', 'cancelled'], default: 'valid' },
   source: { type: String, enum: ['purchase', 'gift', 'business_code', 'vendor'], default: 'purchase' },
   businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business' },
   businessCodeId: { type: mongoose.Schema.Types.ObjectId, ref: 'BusinessCode' }
